@@ -1,0 +1,24 @@
+{
+  "name": "cxt",
+  "version": "1.0.0",
+  "description": "CXT Cryptocurrency",
+  "main": "contracts/cxt.sol",
+  "repository": "git@github.com:fadachai/cxt.git",
+  "author": "CXT Team",
+  "license": "UNLICENSED",
+  "devDependencies": {
+    "@openzeppelin/test-helpers": "^0.5.15",
+    "@truffle/hdwallet-provider": "^2.0.0",
+    "chai": "^4.3.4",
+    "dotenv": "^11.0.0",
+    "truffle": "^5.4.28"
+  },
+  "dependencies": {
+    "@openzeppelin/contracts": "^4.4.2"
+  },
+  "scripts": {
+    "build": "truffle compile --all",
+    "deploy": "truffle migrate --reset",
+    "test": "truffle test"
+  }
+}
