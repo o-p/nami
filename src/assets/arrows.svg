@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="38" height="38" viewBox="0 0 38 38">
+    <defs>
+        <clipPath id="clip-path">
+            <path id="Rectangle_31" fill="none" stroke="#707070" d="M0 0H38V38H0z" transform="translate(701 1047)"/>
+        </clipPath>
+        <style>
+            .cls-3{fill:#fff}
+        </style>
+    </defs>
+    <g id="ic_swap" clip-path="url(#clip-path)" transform="translate(-701 -1047)">
+        <g id="Icon_ionic-ios-swap" transform="translate(702 1048.002)">
+            <path id="Path_313" d="M27.345 18.724a.912.912 0 0 1-.007-1.294l3.319-3.368H14.836a.914.914 0 0 1 0-1.828h15.813L27.33 8.866a.915.915 0 1 1 1.3-1.287l4.853 4.921a.894.894 0 0 1 .19.288.872.872 0 0 1 .07.352.916.916 0 0 1-.26.64l-4.852 4.92a.9.9 0 0 1-1.286.024z" class="cls-3"/>
+            <path id="Path_314" d="M8.655 28.427a.912.912 0 0 0 .007-1.294l-3.311-3.367h15.813a.914.914 0 0 0 0-1.828H5.351L8.67 18.57a.915.915 0 0 0-1.3-1.287L2.517 22.2a.894.894 0 0 0-.19.288.872.872 0 0 0-.07.352.916.916 0 0 0 .26.64l4.852 4.922a.9.9 0 0 0 1.286.025z" class="cls-3"/>
+        </g>
+    </g>
+</svg>
