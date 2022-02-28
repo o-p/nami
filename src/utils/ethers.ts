@@ -19,7 +19,7 @@ export const toWei = (amount: string): BigNumber => {
   try {
     return ethers.utils.parseEther(amount || '0')
   } catch (error) {
-    return handleToUnitErrors(error, amount, 18)
+    return handleToUnitErrors(error as Error, amount, 18)
   }
 }
 
@@ -33,7 +33,7 @@ export const toUnits = (amount: string, decimals: BigNumberish): BigNumber => {
   try {
     return ethers.utils.parseUnits(amount, decimals)
   } catch (error) {
-    return handleToUnitErrors(error, amount, decimals)
+    return handleToUnitErrors(error as Error, amount, decimals)
   }
 }
 

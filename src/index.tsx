@@ -1,14 +1,25 @@
 import React from 'react'
-import ReactDOM from 'react-dom'
+import { render } from 'react-dom'
 
-import App from './App'
+import {
+  UseWalletWrapperProvider,
+  WalletProvider,
+} from 'contexts/Wallet'
+import GameView from 'containers/GameView'
+import MuiTheme from './theme'
 import reportWebVitals from './reportWebVitals'
 
 import './index.scss'
 
-ReactDOM.render(
+render(
   <React.StrictMode>
-    <App />
+    <MuiTheme>
+      <UseWalletWrapperProvider>
+        <WalletProvider>
+          <GameView />
+        </WalletProvider>
+      </UseWalletWrapperProvider>
+    </MuiTheme>
   </React.StrictMode>,
   document.getElementById('root')
 )

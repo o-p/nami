@@ -1,0 +1,173 @@
+import { useState } from 'react'
+import styled from 'styled-components'
+import Box, { BoxProps } from '@mui/material/Box'
+
+import { ImageObject } from 'slot-machine'
+import { Layers } from './images'
+
+import Bets from './Bets'
+import Reel from './Reel'
+import StartButton from './StartButton'
+
+const Layer = styled(function ImageLayer({ className, images, title = '' }: {
+    className?: string
+    images: ImageObject
+    title?: string
+    zIndex?: number
+  }) {
+    const { x1, x2, x3 } = images
+    return (
+      <img
+        className={className}
+        src={x1}
+        srcSet={`
+          ${x2} 2x,
+          ${x3} 3x
+        `}
+        height="100%"
+        alt={title}
+      />
+    )
+  })`
+    position: absolute;
+    top: 0;
+    left: calc((100% - 428px) / 2);
+    z-index: ${props => props.zIndex ?? 0}
+  `
+
+const Score = styled.h3`
+  text-align: center;
+  z-index: 100;
+  color: #FFF;
+  max-width: 428px;
+  padding: 0 12%;
+  margin: 0;
+  font-size: 24px;
+  line-height: 38px;
+`
+const SYMBOL_COUNTS = 5
+function RNG() {
+  return [
+    Math.floor(Math.random() * SYMBOL_COUNTS),
+    Math.floor(Math.random() * SYMBOL_COUNTS),
+    Math.floor(Math.random() * SYMBOL_COUNTS),
+  ]
+}
+
+export default function SlotMachine(props: BoxProps) {
+  const [slots, setSlots] = useState({
+    spinning: false,
+    stops: RNG(),
+  })
+
+  return (
+    <Box
+      width="100%"
+      minHeight={926}
+      position="relative"
+      overflow="hidden"
+      zIndex={0}
+    >
+      <Box
+        width="100%"
+        height={926}
+        position="relative"
+        top={0}
+      >
+        <Layer images={Layers.background} zIndex={10} />
+        <Layer images={Layers.foreground} zIndex={20} />
+      </Box>
+      <Box
+        width="100%"
+        position="absolute"
+        top={220}
+        zIndex={30}
+      >
+        <Box
+          width="100%"
+          position="relative"
+          display="flex"
+          flexDirection="column"
+          alignItems="center"
+        >
+          <Score>SCORE</Score>
+          {/* Reels */}
+          <Box
+            width={340}
+            height={196}
+            zIndex={30}
+            overflow="hidden"
+            display="flex"
+            onClick={() => setSlots({
+              spinning: !slots.spinning,
+              stops: slots.spinning ? RNG() : slots.stops,
+            })}
+          >
+            <Reel
+              spinning={slots.spinning}
+              shift={slots.stops[0]}
+              flex="30%"
+            />
+            <Reel
+              spinning={slots.spinning}
+              shift={slots.stops[1]}
+              flex="30%"
+            />
+            <Reel
+              spinning={slots.spinning}
+              shift={slots.stops[2]}
+              flex="30%"
+            />
+          </Box>{/* /Reels */}
+
+          {/* Bets */}
+          <Box
+            height={116}
+            width={330}
+          >
+            <Box
+              height={58}
+              width={330}
+              display="flex"
+              flexDirection="row"
+              alignItems="center"
+              justifyContent="space-evenly"
+            >
+              <Bets amount="5" />
+              <Bets amount="10" />
+              <Bets amount="50" />
+            </Box>
+            <Box
+              height={58}
+              width={330}
+              display="flex"
+              flexDirection="row"
+              alignItems="center"
+              justifyContent="space-evenly"
+            >
+              <Bets amount="100" />
+              <Bets amount="500" />
+              <Bets amount="1000" />
+            </Box>
+          </Box>{/* /Bets */}
+
+          {/* Start */}
+          <Box
+            width={200}
+            height={130}
+            display="flex"
+            alignItems="center"
+            justifyContent="center"
+          >
+            <StartButton
+              onClick={() => setSlots({
+                spinning: !slots.spinning,
+                stops: slots.spinning ? RNG() : slots.stops,
+              })}
+            />
+          </Box>{/* /Start */}
+        </Box>
+      </Box>
+    </Box>
+  )
+}

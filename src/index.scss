@@ -1,19 +1,29 @@
-// body {
-//   margin: 0;
-//   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-//     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-//     sans-serif;
-//   -webkit-font-smoothing: antialiased;
-//   -moz-osx-font-smoothing: grayscale;
-// }
+@import url('https://fonts.googleapis.com/css2?family=Revalia&display=swap');
 
-// h2 {
-//   text-decoration: underline;
-// }
+body {
+  font-family: 'Revalia', cursive;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  padding: 0;
+  margin: 0;
 
-// code {
-//   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-//     monospace;
-// }
+  background-color: #715ca4;
+  background-image:
+    url("assets/background.png"),
+    linear-gradient(180deg, #715ca4 1%, #86d0ef 1%);
+  background-size: 427px 926px, cover;
+  background-repeat: repeat-x;
+  background-position: center top;
 
-// @import '~react-vis/dist/style';
+  @media only screen and (min-resolution: 1.25dppx) and (max-resolution: 2.25dppx) {
+    background-image:
+      url("assets/background@2x.png"),
+      linear-gradient(180deg, #715ca4 1%, #86d0ef 1%);
+  }
+
+  @media only screen and (min-resolution: 2.25dppx) {
+    background-image:
+      url("assets/background@3x.png"),
+      linear-gradient(180deg, #715ca4 1%, #86d0ef 1%);
+  }
+}
