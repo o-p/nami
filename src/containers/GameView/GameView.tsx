@@ -1,20 +1,17 @@
 import React, { useState, forwardRef } from 'react'
 import styled from 'styled-components'
-import Fade from '@mui/material/Fade'
-import Container from '@mui/material/Container'
 import Box from '@mui/material/Box'
+import Container from '@mui/material/Container'
 import Dialog from '@mui/material/Dialog'
+import Fade from '@mui/material/Fade'
 import Slide, { SlideProps } from '@mui/material/Slide'
-
-// import NetworkChecker from 'components/NetworkChecker'
-// import { TokenProvider } from 'context/Tokens'
-// import { GlobalsProvider } from 'context/Globals/Context'
-// import { UserProvider } from 'context/User'
 
 import { grayscaled } from './images'
 import MenuButton from 'components/MenuButton'
 import SlotMachine from 'components/SlotMachine'
+import Header from 'containers/Header'
 import TreasureChests from 'containers/TreasureChests'
+import useDApp from 'contexts/Web3'
 
 import './GameView.scss'
 
@@ -41,8 +38,11 @@ const Transition = forwardRef<unknown, SlideProps>(function Transition(props, re
 })
 
 function GameView() {
+  const dapp = useDApp()
   const [showChests, setChestsModal] = useState(false)
   const hasTreasure = Math.random() > 0.5
+
+  // console.log(dapp)
 
   return (
     <Container
@@ -76,6 +76,13 @@ function GameView() {
       >
         <TreasureChests />
       </Dialog>
+
+      <Header
+        position="absolute"
+        left={60}
+        right={60}
+        top={10}
+      />
 
       <SlotMachine />
 

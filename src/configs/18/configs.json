@@ -1,0 +1,24 @@
+{
+  "environment": "testnet",
+  "chain-id": 18,
+  "rpc-url": "https://testnet-rpc.thundercore.com",
+  "token": {
+    "PDT": {
+      "address": ""
+    },
+    "WTT": {
+      "address": "0x390127E81EDe57CFa1e65eA9A96bD68A59D0a099"
+    }
+  },
+  "contract": {
+    "Game": {
+      "address": ""
+    },
+    "Multicall": {
+      "address": "0x7818a6A0fFe134b2aF30850DCE7c86A52eC6AC4F"
+    },
+    "Multicall2": {
+      "address": "0x02C5503dd793cC457a1CE50d2d31a749cb5e9cB5"
+    }
+  }
+}

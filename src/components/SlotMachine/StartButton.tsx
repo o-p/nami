@@ -9,14 +9,14 @@ const ImageButton = styled(ButtonBase)(({ theme }) => ({
   position: 'relative',
   width: 130,
   height: 60,
-  borderRadius: '40%',
+  borderRadius: 30,
 }))
 
 const ImageSrc = styled('span')({
   position: 'absolute',
   left: -50,
   right: -40,
-  top: -60,
+  top: -70,
   bottom: -75,
   backgroundSize: 'contain',
   backgroundPosition: 'center',
@@ -25,10 +25,16 @@ const ImageSrc = styled('span')({
 
 export default function StartButton(props: ButtonBaseProps) {
   return (
-    <ImageButton {...props}>
+    <ImageButton
+      TouchRippleProps={{
+        // @ts-ignore
+        sx: { color: '#00000030' },
+      }}
+      {...props}
+    >
       <ImageSrc
         style={{
-          backgroundImage: `url(${images.base.x1})`
+          backgroundImage: `url(${images.charged.x1})`
         }}
       />
     </ImageButton>

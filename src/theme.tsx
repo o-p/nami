@@ -48,6 +48,10 @@ export const theme = createTheme({
   transitions: {},
   typography: {
     fontFamily: 'Revalia, cursive',
+    h1: {
+      fontSize: 28,
+      color: '#00000099',
+    },
     treasureHints: {
       color: 'yellow',
       fontSize: 32,

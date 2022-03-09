@@ -4,6 +4,14 @@ import '@mui/material/styles'
 import '@mui/material/Typography'
 import 'styled-components'
 
+declare module 'configs' {
+  export default interface AppConfig {
+    name: string
+    version: string
+    environment: string
+  }
+}
+
 declare module 'slot-machine' {
   export interface ImageObject {
     x1: string

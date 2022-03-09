@@ -1,0 +1,24 @@
+{
+  "environment": "mainnet",
+  "chain-id": 108,
+  "rpc-url": "https://mainnet-rpc.thundercore.com",
+  "token": {
+    "PDT": {
+      "address": ""
+    },
+    "WTT": {
+      "address": "0x413cEFeA29F2d07B8F2acFA69d92466B9535f717"
+    }
+  },
+  "contract": {
+    "Game": {
+      "address": ""
+    },
+    "Multicall": {
+      "address": "0x3017086DeEf56679e267F67F66c4415109b7A97f"
+    },
+    "Multicall2": {
+      "address": "0xd1dC5CF410b227dFEeFEe8D3c1C9DB4FBE66d362"
+    }
+  }
+}

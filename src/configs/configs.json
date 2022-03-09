@@ -1,0 +1,29 @@
+{
+  "name": "Planet Master",
+  "version": "1.0",
+  "environment": "default",
+  "chain-id": 0,
+  "rpc-url": "",
+  "token": {
+    "PDT": {
+      "address": "",
+      "decimals": 18
+    },
+    "WTT": {
+      "address": "",
+      "decimals": 18
+    }
+  },
+  "contract": {
+    "Game": {
+      "address": ""
+    },
+    "Multicall": {
+      "address": ""
+    },
+    "Multicall2": {
+      "address": ""
+    }
+  }
+}
+

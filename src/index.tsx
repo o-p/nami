@@ -1,10 +1,7 @@
 import React from 'react'
 import { render } from 'react-dom'
 
-import {
-  UseWalletWrapperProvider,
-  WalletProvider,
-} from 'contexts/Wallet'
+import { Provider as DApp } from 'contexts/Web3'
 import GameView from 'containers/GameView'
 import MuiTheme from './theme'
 import reportWebVitals from './reportWebVitals'
@@ -14,11 +11,9 @@ import './index.scss'
 render(
   <React.StrictMode>
     <MuiTheme>
-      <UseWalletWrapperProvider>
-        <WalletProvider>
-          <GameView />
-        </WalletProvider>
-      </UseWalletWrapperProvider>
+      <DApp>
+        <GameView />
+      </DApp>
     </MuiTheme>
   </React.StrictMode>,
   document.getElementById('root')
