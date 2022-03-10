@@ -25,8 +25,22 @@ const BetIcons = Object.fromEntries(
 
 interface BetProps extends IconButtonProps {
   amount: '5' | '10' | '50' | '100' | '500' | '1000'
+  selected?: boolean
 }
-export default function Bets({ amount = '5', ...props }: BetProps) {
+export default function Bets({ amount = '5', selected, ...props }: BetProps) {
+  if (selected) {
+    return (
+      <div>
+        <IconButton {...props} sx={{
+          filter: `hue-rotate(40deg)`,
+          transition: `all 0.12s ease-in`,
+        }}>
+          { BetIcons[amount] }
+        </IconButton>
+      </div>
+    )
+  }
+
   return (
     <div>
       <IconButton {...props}>

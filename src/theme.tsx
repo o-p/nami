@@ -50,7 +50,8 @@ export const theme = createTheme({
     fontFamily: 'Revalia, cursive',
     h1: {
       fontSize: 28,
-      color: '#00000099',
+      color: '#000',
+      textShadow: `0 1px #868cc0`,
     },
     treasureHints: {
       color: 'yellow',
@@ -60,6 +61,15 @@ export const theme = createTheme({
       '& small': {
         fontSize: 10,
       },
+    },
+    balance: {
+      fontSize: 14,
+      lineHeight: 1.5,
+      color: '#000',
+      textShadow: `
+        1px 0 1px #FFF,
+        -1px 1px 1px #FF08
+      `
     },
   },
   zIndex: {},

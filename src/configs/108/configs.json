@@ -2,6 +2,18 @@
   "environment": "mainnet",
   "chain-id": 108,
   "rpc-url": "https://mainnet-rpc.thundercore.com",
+  "network": {
+    "chainId": "0x6c",
+    "chainName": "ThunderCore Mainnet",
+    "rpcUrls": ["https://mainnet-rpc.thundercore.com"],
+    "iconUrls": ["https://thundercore.github.io/dist/thundercore.png"],
+    "blockExplorerUrls": ["https://viewblock.io/thundercore/"],
+    "nativeCurrency": {
+      "name": "ThunderCore Token",
+      "symbol": "TT",
+      "decimals": 18
+    }
+  },
   "token": {
     "PDT": {
       "address": ""

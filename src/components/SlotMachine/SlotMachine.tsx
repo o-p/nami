@@ -4,7 +4,7 @@ import Box, { BoxProps } from '@mui/material/Box'
 
 import { ImageObject } from 'slot-machine'
 import { Layers } from './images'
-
+import useDApp from 'contexts/Web3'
 import Bets from './Bets'
 import Reel from './Reel'
 import StartButton from './StartButton'
@@ -55,10 +55,15 @@ function RNG() {
 }
 
 export default function SlotMachine(props: BoxProps) {
+  // const { wallet } = useDApp()
+  // const { balance } = wallet as { balance: string }
   const [slots, setSlots] = useState({
     spinning: false,
     stops: RNG(),
   })
+
+  const [betAmount, chooseBetAmount] = useState(0)
+  // TODO useMount => betAmount == 0 => 自動 choose 最大
 
   return (
     <Box
@@ -98,10 +103,6 @@ export default function SlotMachine(props: BoxProps) {
             zIndex={30}
             overflow="hidden"
             display="flex"
-            onClick={() => setSlots({
-              spinning: !slots.spinning,
-              stops: slots.spinning ? RNG() : slots.stops,
-            })}
           >
             <Reel
               spinning={slots.spinning}
@@ -133,9 +134,21 @@ export default function SlotMachine(props: BoxProps) {
               alignItems="center"
               justifyContent="space-evenly"
             >
-              <Bets amount="5" />
-              <Bets amount="10" />
-              <Bets amount="50" />
+              <Bets
+                amount="5"
+                selected={betAmount === 5}
+                onClick={() => chooseBetAmount(5) }
+              />
+              <Bets
+                amount="10"
+                selected={betAmount === 10}
+                onClick={() => chooseBetAmount(10) }
+              />
+              <Bets
+                amount="50"
+                selected={betAmount === 50}
+                onClick={() => chooseBetAmount(50) }
+              />
             </Box>
             <Box
               height={58}
@@ -145,9 +158,21 @@ export default function SlotMachine(props: BoxProps) {
               alignItems="center"
               justifyContent="space-evenly"
             >
-              <Bets amount="100" />
-              <Bets amount="500" />
-              <Bets amount="1000" />
+              <Bets
+                amount="100"
+                selected={betAmount === 100}
+                onClick={() => chooseBetAmount(100) }
+              />
+              <Bets
+                amount="500"
+                selected={betAmount === 500}
+                onClick={() => chooseBetAmount(500) }
+              />
+              <Bets
+                amount="1000"
+                selected={betAmount === 1000}
+                onClick={() => chooseBetAmount(1000) }
+              />
             </Box>
           </Box>{/* /Bets */}
 
@@ -158,8 +183,10 @@ export default function SlotMachine(props: BoxProps) {
             display="flex"
             alignItems="center"
             justifyContent="center"
+            overflow="hidden"
           >
             <StartButton
+              disabled={betAmount === 0 /* TODO 檢查 balance */ }
               onClick={() => setSlots({
                 spinning: !slots.spinning,
                 stops: slots.spinning ? RNG() : slots.stops,

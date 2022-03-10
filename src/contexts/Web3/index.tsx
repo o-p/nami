@@ -1,13 +1,9 @@
 import {
   createContext,
   useContext,
-  useEffect,
-  useRef,
-  useMemo,
-  useState,
   ReactChild,
 } from 'react'
-import { Connectors, useWallet, UseWalletProvider } from 'use-wallet'
+import { UseWalletProvider } from 'use-wallet'
 import { ethers } from 'ethers'
 import { JsonRpcProvider } from '@ethersproject/providers'
 
@@ -15,10 +11,14 @@ import configs, { config } from 'configs'
 import useMount from 'hooks/useMount'
 import useGlobalStates, { AppGlobalState } from './useGlobalStates'
 
+const debug = require('debug')('planet-master:context:web3')
+
 export const context = createContext<AppGlobalState>({
   configs,
   balances: {},
   network: {},
+  wallet: {},
+  actions: {},
 })
 
 function AppGlobalsProvider({ children }: { children: ReactChild }) {
@@ -41,18 +41,15 @@ function AppGlobalsProvider({ children }: { children: ReactChild }) {
             : new ethers.providers.Web3Provider(window.ethereum)
 
           const accounts = await library.listAccounts()
+          debug('provider accounts: %o', accounts)
 
           if (accounts.length >= 1) {
-            actions.setConnection('injected')
-            // setConnection('injected')
-          } else {
-            actions.setConnection('')
-            // connectByNetwork()
+            debug('already bind accounts, auto-connect to injected provider')
+            return actions.setConnection('injected')
           }
-        } else {
-          actions.setConnection('')
-          // connectByNetwork()
         }
+        debug('no suitable provider, use json-rpc provider')
+        return actions.setConnection('')
       }
     }
 

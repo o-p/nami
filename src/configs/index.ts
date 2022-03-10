@@ -10,4 +10,4 @@ const overrides = require(`./${NetworkID}/configs.json`)
 const merged = merge(defaults, overrides)
 export default merged
 
-export const config = curry(get, 2)(get) as <T>(path: string, defaultValue?: T) => T
+export const config = curry(get, 2)(merged) as <T>(path: string, defaultValue?: T) => T

@@ -28,7 +28,7 @@ export default function StartButton(props: ButtonBaseProps) {
     <ImageButton
       TouchRippleProps={{
         // @ts-ignore
-        sx: { color: '#00000030' },
+        sx: { color: '#0003' },
       }}
       {...props}
     >

@@ -4,6 +4,7 @@
   "environment": "default",
   "chain-id": 0,
   "rpc-url": "",
+  "network": {},
   "token": {
     "PDT": {
       "address": "",

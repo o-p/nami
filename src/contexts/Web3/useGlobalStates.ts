@@ -1,5 +1,5 @@
-import { useEffect, useMemo, useReducer } from 'react'
-import { useWallet, Connectors } from 'use-wallet'
+import { useCallback, useEffect, useMemo, useReducer } from 'react'
+import { useWallet, Connectors, Wallet } from 'use-wallet'
 import { ethers, Contract, ContractInterface } from 'ethers'
 import { AbiItem } from 'web3-utils'
 import { ExternalProvider, JsonRpcProvider, BaseProvider } from '@ethersproject/providers'
@@ -19,7 +19,7 @@ export interface AppGlobalState {
     }
   }
   network: any
-  wallet: {
+  wallet: Wallet<unknown> | {
     account?: string
     chainId?: number
     ethereum?: any
@@ -69,7 +69,11 @@ function useERC20(provider: BaseProvider, address: string) {
 }
 
 function useWTT(provider: BaseProvider) {
-  return useERC20(provider, config('token.WTT'))
+  return useERC20(provider, config('token.WTT.address'))
+}
+
+function useDPT(provider: BaseProvider) {
+  return useERC20(provider, config('token.DPT.address'))
 }
 
 function useClientWallet() {
@@ -101,12 +105,17 @@ export default function useGlobalStates() {
     ...changes,
   }), initState)
 
-  const wTT = useWTT(fullState.network.defaultProvider)
+  const DPT = useDPT(fullState.network.defaultProvider)
 
   useEffect(() => {
-    if (wallet.account) {
+    if (wallet.account && DPT) {
       // @ts-ignore
-      wTT.balanceOf(wallet.account).then(wTTBalance => changeState({ wTTBalance }))
+      DPT.balanceOf(wallet.account).then(balance => changeState({
+        balances: {
+          ...fullState.balances,
+          DPT: balance,
+        },
+      }))
     }
     /* eslint-disable-next-line react-hooks/exhaustive-deps */
   }, [wallet.account])
@@ -153,6 +162,24 @@ export default function useGlobalStates() {
               defaultProvider: fullState.network.providers.jsonRpc,
             },
           })
+        }
+      },
+
+      switchNetwork() {
+        if (window.ethereum) {
+          window.ethereum
+            .request({
+              method: 'wallet_addEthereumChain',
+              params: [configs.network],
+            })
+            .catch((error: any) => {
+              changeState({
+                network: {
+                  ...fullState.network,
+                  error,
+                },
+              })
+            })
         }
       },
     },

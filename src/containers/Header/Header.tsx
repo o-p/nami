@@ -1,23 +1,53 @@
+import React, { useMemo } from 'react'
+import { ethers } from 'ethers'
 import Box, { BoxProps } from '@mui/material/Box'
+import styled from 'styled-components'
 import Typography from '@mui/material/Typography'
 
 import { useDApp } from 'contexts/Web3'
 import ConnectButton from './ConnectButton'
 
-export default function Header(props: BoxProps) {
-  const dapp = useDApp()
+import ImageTT from './images/TT.png'
+import ImagePDT from './images/PDT.png'
 
-  console.log(dapp)
+const IconTT = styled.img.attrs({
+  src: ImageTT,
+})`
+  width: 20px;
+  height: 20px;
+  display: inline-block;
+  vertical-align: bottom;
+`
+const IconPDT = styled.img.attrs({
+  src: ImagePDT,
+})`
+  width: 20px;
+  height: 20px;
+  display: inline-block;
+  vertical-align: bottom;
+`
+
+export default function Header(props: BoxProps) {
+  const { configs, wallet, balances } = useDApp()
+
+  const { balance } = wallet as { balance: string }
+  const balanceTT = useMemo(() => (
+    ethers.utils.commify(
+      ethers.utils.formatEther(balance)
+                  .replace(/(\.\d{3})\d+$/, '$1')
+    )
+  ), [balance])
 
   return (
     <Box
       component="header"
       display="flex"
       flexDirection="column"
+      zIndex={30}
       {...props}
     >
       <Typography variant="h1" align="center">
-        { dapp.configs.name }
+        { configs.name }
       </Typography>
       <Box
         display="flex"
@@ -30,12 +60,14 @@ export default function Header(props: BoxProps) {
           <ConnectButton />
         </Box>{/* /Connection Button */}
         {/* Balances */}
-        <Box p={1}>
-          <Typography>
-            Balance 1 TT
+        <Box paddingX={1}>
+          <Typography variant="balance" component="p">
+            { balanceTT }
+            <IconTT />
           </Typography>
-          <Typography>
-            Balance 2 $PDT (i)
+          <Typography variant="balance" component="p">
+            { balances.PDT ?? 0 }
+            <IconPDT />
           </Typography>
         </Box>{/* /Balances */}
       </Box>
