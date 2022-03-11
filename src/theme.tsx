@@ -63,12 +63,16 @@ export const theme = createTheme({
       },
     },
     balance: {
-      fontSize: 14,
+      fontFamily: `'VT323', monospace`,
+      fontSize: 20,
+      textAlign: 'right',
       lineHeight: 1.5,
       color: '#000',
       textShadow: `
-        1px 0 1px #FFF,
-        -1px 1px 1px #FF08
+        -1px  1px #FFF8,
+         1px -1px #F5F6,
+         1px  1px #FF49,
+        -1px -1px #6FF9
       `
     },
   },

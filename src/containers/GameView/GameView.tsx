@@ -38,11 +38,9 @@ const Transition = forwardRef<unknown, SlideProps>(function Transition(props, re
 })
 
 function GameView() {
-  const dapp = useDApp()
+  // const { error, balances } = useDApp()
   const [showChests, setChestsModal] = useState(false)
-  const hasTreasure = Math.random() > 0.5
-
-  // console.log(dapp)
+  const hasTreasure = false // balance.P.amount.gte() Math.random() > 0.5
 
   return (
     <Container

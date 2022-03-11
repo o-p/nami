@@ -1,51 +1,37 @@
 import React, { useMemo } from 'react'
-import { ethers } from 'ethers'
 import Box, { BoxProps } from '@mui/material/Box'
 import styled from 'styled-components'
 import Typography from '@mui/material/Typography'
 
 import { useDApp } from 'contexts/Web3'
 import ConnectButton from './ConnectButton'
+import formatWei from 'utils/formatWei'
 
 import ImageTT from './images/TT.png'
 import ImageP from './images/P.png'
 
-console.log(ImageP)
-
 const IconTT = styled.img.attrs({
   src: ImageTT,
 })`
-  width: 20px;
-  height: 20px;
-  display: inline-block;
-  vertical-align: bottom;
+  width: 22px;
+  height: 22px;
+  vertical-align: sub;
 `
 const IconP = styled.img.attrs({
   src: ImageP,
 })`
-  width: 20px;
-  height: 20px;
-  display: inline-block;
-  vertical-align: bottom;
+  width: 22px;
+  height: 22px;
+  vertical-align: sub;
 `
+
+const formatCurrency = formatWei()
 
 export default function Header(props: BoxProps) {
   const { configs, wallet, balances } = useDApp()
 
   const { balance } = wallet as { balance: string }
-  const balanceTT = useMemo(() => (
-    ethers.utils.commify(
-      ethers.utils.formatEther(balance)
-                  .replace(/(\.\d{3})\d+$/, '$1')
-    )
-  ), [balance])
-
-  const balanceP = useMemo(() => (
-    ethers.utils.commify(
-      ethers.utils.formatEther(balances.P?.amount ?? '0')
-                  .replace(/(\.\d{3})\d+$/, '$1')
-    )
-  ), [balances.P])
+  const balanceTT = useMemo(() => formatCurrency(balance), [balance])
 
   return (
     <Box
@@ -75,7 +61,7 @@ export default function Header(props: BoxProps) {
             <IconTT />
           </Typography>
           <Typography variant="balance" component="p">
-            { balanceP }
+            { balances?.P?.display ?? '0.00' }
             <IconP />
           </Typography>
         </Box>{/* /Balances */}

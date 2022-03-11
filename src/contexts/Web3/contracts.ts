@@ -7,6 +7,7 @@ import { config } from 'configs'
 
 const ERC20: AbiItem = require('./abi/ERC20.abi.json')
 const SlotMachine: AbiItem = require('./abi/SlotMachine.abi.json')
+const Multicall2: AbiItem = require('./abi/Multicall2.abi.json')
 
 function createContractInstance(provider: BaseProvider, address: string, abi: ethers.ContractInterface): Contract | null {
   try {
@@ -39,4 +40,8 @@ export function useP(provider: BaseProvider) {
 
 export function useSlotMachine(provider: BaseProvider) {
   return useContract(provider, config('contract.SlotMachine'), SlotMachine)
+}
+
+export function useMulticall2(provider: BaseProvider) {
+  return useContract(provider, config('contract.Multicall2'), Multicall2)
 }

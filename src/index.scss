@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Revalia&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Revalia&family=VT323&display=swap');
 
 body {
   font-family: 'Revalia', cursive;
@@ -26,4 +26,8 @@ body {
       url("assets/background@3x.png"),
       linear-gradient(180deg, #715ca4 1%, #86d0ef 1%);
   }
+}
+
+code {
+  font-family: 'VT323', monospace;
 }

@@ -6,6 +6,7 @@ import { ExternalProvider } from '@ethersproject/providers'
 import configs, { config } from 'configs'
 import useThunderHub from './useThunderHub'
 import { useP, useSlotMachine } from './contracts'
+import formatWei from 'utils/formatWei'
 
 const debug = require('debug')('planet-master:use-global-states')
 
@@ -13,7 +14,7 @@ export interface AppGlobalState {
   configs: any
   balances: {
     [token: string]: {
-      amount: string
+      amount: BigNumber
       decimals: number
       display: string
     }
@@ -48,7 +49,7 @@ const initState: AppGlobalState = {
 }
 
 function useClientWallet() {
-  const wallet = useWallet()
+  const wallet = useWallet({ pollBalanceInterval: 3000 })
   const { isHub, hubData } = useThunderHub()
 
   return useMemo(
@@ -69,6 +70,7 @@ function useClientWallet() {
   )
 }
 
+const formatP = formatWei()
 export default function useGlobalStates() {
   const wallet = useClientWallet()
   const [fullState, changeState] = useReducer((full: AppGlobalState, changes: Partial<AppGlobalState>) => ({
@@ -92,9 +94,15 @@ export default function useGlobalStates() {
       value: ethers.utils.parseEther(bet.toString()),
     })
 
-    const { events } = await wait()
+    const { events } = await wait(1)
 
     debug('Play slot-machine, got events: %o', events)
+
+    const event = events.find(({ event }: { event: string }) => event === 'Play')
+
+    // Contract didn't emit Play event correctly.
+    // One possible reason could be the Vault liquidity too low.
+    if (!event) throw new Error('Play failure, please try again.')
 
     const {
       args: {
@@ -104,7 +112,7 @@ export default function useGlobalStates() {
         payment,
         tokenReward,
       },
-    } = events.find(({ event }: { event: string }) => event === 'Play')
+    } = event
 
     return {
       symbols: [
@@ -179,10 +187,10 @@ export default function useGlobalStates() {
           balances: {
             ...fullState.balances,
             P: {
-              amount: balance.toString(),
+              amount: balance,
               decimals: 18,
-              display: 'TODO', // TODO
-            }, // ethers.utils.formatEther(balance).replace(/(\.\d{3})\d+$/, '$1'),
+              display: formatP(balance),
+            },
           },
         }))
         .catch((e) => {

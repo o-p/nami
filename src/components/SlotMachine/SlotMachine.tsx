@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react'
+import { useCallback, useState, useEffect } from 'react'
 import styled from 'styled-components'
 import Box, { BoxProps } from '@mui/material/Box'
 import { ethers } from 'ethers'
@@ -59,7 +59,6 @@ function RNG() {
 
 export default function SlotMachine(props: BoxProps) {
   const { actions, wallet: { balance } } = useDApp()
-  // const { balance } = wallet as { balance: string }
   const [slots, setSlots] = useState({
     spinning: false,
     stops: RNG(),
@@ -68,7 +67,6 @@ export default function SlotMachine(props: BoxProps) {
   const tt = Number(ethers.utils.formatEther(balance ?? 0))
 
   const [betAmount, chooseBetAmount] = useState(0)
-  // TODO useMount => betAmount == 0 => 自動 choose 最大
 
   const play = useCallback(async () => {
     setSlots({ ...slots, spinning: true })
@@ -89,6 +87,19 @@ export default function SlotMachine(props: BoxProps) {
       })
       /* eslint-disable-next-line react-hooks/exhaustive-deps */
   }, [slots, betAmount, actions.play])
+
+  useEffect(() => {
+    // Auto choose max bet
+    if (betAmount === 0) {
+      const defaultAmount = [1000, 500, 100, 50, 10, 5].find(amount => tt > amount)
+      if ((defaultAmount as number) > 0) chooseBetAmount(defaultAmount as number)
+      return
+    // Auto reset bets if TT is too low
+    } else if (betAmount > tt) {
+      chooseBetAmount(0)
+      return
+    }
+  }, [tt])
 
   return (
     <Box
