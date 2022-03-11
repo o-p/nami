@@ -6,25 +6,24 @@
   "rpc-url": "",
   "network": {},
   "token": {
-    "PDT": {
+    "P": {
       "address": "",
+      "name": "Planet Token",
+      "symbol": "P",
       "decimals": 18
     },
     "WTT": {
       "address": "",
+      "name": "Wrapped Thunder Token",
+      "symbol": "wTT",
       "decimals": 18
     }
   },
   "contract": {
-    "Game": {
-      "address": ""
-    },
-    "Multicall": {
-      "address": ""
-    },
-    "Multicall2": {
-      "address": ""
-    }
+    "Vault": "",
+    "SlotMachine": "",
+    "Multicall": "",
+    "Multicall2": ""
   }
 }
 

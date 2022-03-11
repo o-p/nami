@@ -1,16 +1,16 @@
 import { useCallback, useEffect, useMemo, useReducer } from 'react'
 import { useWallet, Connectors, Wallet } from 'use-wallet'
-import { ethers, Contract, ContractInterface } from 'ethers'
-import { AbiItem } from 'web3-utils'
-import { ExternalProvider, JsonRpcProvider, BaseProvider } from '@ethersproject/providers'
+import { BigNumber, BigNumberish, ethers } from 'ethers'
+import { ExternalProvider } from '@ethersproject/providers'
 
-import ERC20 from './abi/ERC20.abi.json'
 import configs, { config } from 'configs'
 import useThunderHub from './useThunderHub'
+import { useP, useSlotMachine } from './contracts'
+
+const debug = require('debug')('planet-master:use-global-states')
 
 export interface AppGlobalState {
   configs: any
-  debug?: any
   balances: {
     [token: string]: {
       amount: string
@@ -21,6 +21,7 @@ export interface AppGlobalState {
   network: any
   wallet: Wallet<unknown> | {
     account?: string
+    balance?: string
     chainId?: number
     ethereum?: any
   }
@@ -29,51 +30,21 @@ export interface AppGlobalState {
   }
 }
 
-const jsonRpc = new ethers.providers.JsonRpcProvider(config<string>('rpc-url', ''))
+const readonly = new ethers.providers.JsonRpcProvider(config<string>('rpc-url', ''))
 
 const initState: AppGlobalState = {
   configs,
-  debug: null,
   balances: {},
   network: {
-    defaultProvider: jsonRpc,
+    defaultProvider: readonly,
     providers: {
-      jsonRpc,
+      readonly,
     },
     isReadOnly: true,
     error: null,
   },
   wallet: {},
   actions: {},
-}
-
-function createContractInstance(provider: BaseProvider, address: string, abi: ethers.ContractInterface): Contract | null {
-  try {
-    return new ethers.Contract(address, abi, provider)
-  } catch (e) {
-    console.error(e)
-    return null
-  }
-}
-
-function useContract(provider: BaseProvider, address: string, abi: AbiItem) {
-  /* eslint-disable-next-line react-hooks/exhaustive-deps */
-  return useMemo<Contract | null>(
-    () => createContractInstance(provider, address, abi as unknown as ContractInterface),
-    [provider, address, abi]
-  )
-}
-
-function useERC20(provider: BaseProvider, address: string) {
-  return useContract(provider, address, ERC20 as any as AbiItem)
-}
-
-function useWTT(provider: BaseProvider) {
-  return useERC20(provider, config('token.WTT.address'))
-}
-
-function useDPT(provider: BaseProvider) {
-  return useERC20(provider, config('token.DPT.address'))
 }
 
 function useClientWallet() {
@@ -105,83 +76,160 @@ export default function useGlobalStates() {
     ...changes,
   }), initState)
 
-  const DPT = useDPT(fullState.network.defaultProvider)
+  const tokenP = useP(fullState.network.defaultProvider) as null | {
+    balanceOf: (account: string) => Promise<BigNumber>
+  }
 
-  useEffect(() => {
-    if (wallet.account && DPT) {
-      // @ts-ignore
-      DPT.balanceOf(wallet.account).then(balance => changeState({
-        balances: {
-          ...fullState.balances,
-          DPT: balance,
+  const game = useSlotMachine(fullState.network.defaultProvider) as null | {
+    play: (settings: { value: BigNumberish }) => any
+  }
+
+  const play = useCallback(async (bet: number) => {
+    if (wallet.status !== 'connected') throw new Error('Unable to play game before connecting')
+
+    console.log('bet amount: ', ethers.utils.parseEther(bet.toString()))
+    const { wait } = await game?.play({
+      value: ethers.utils.parseEther(bet.toString()),
+    })
+
+    const { events } = await wait()
+
+    debug('Play slot-machine, got events: %o', events)
+
+    const {
+      args: {
+        left,
+        mid,
+        right,
+        payment,
+        tokenReward,
+      },
+    } = events.find(({ event }: { event: string }) => event === 'Play')
+
+    return {
+      symbols: [
+        left.toNumber(),
+        mid.toNumber(),
+        right.toNumber(),
+      ],
+      payment: ethers.utils.formatEther(payment),
+      tokenReward: ethers.utils.formatEther(tokenReward),
+    }
+  }, [wallet.status, game])
+
+  const setConnection = useCallback(async (method: keyof Connectors | '') => {
+    debug('switch connection to: %s', method)
+    if (method !== '') {
+      try {
+        await wallet.connect(method)
+        changeState({
+          network: {
+            ...fullState.network,
+            isReadOnly: false,
+            defaultProvider: method,
+            error: null,
+          },
+        })
+      } catch (error) {
+        debug('Set connection error: %o', error)
+        changeState({
+          network: {
+            ...fullState.network,
+            isReadOnly: true,
+            defaultProvider: 'readonly',
+            error,
+          }
+        })
+      }
+    } else {
+      changeState({
+        network: {
+          ...fullState.network,
+          isReadOnly: true,
+          defaultProvider: 'readonly',
         },
-      }))
+      })
+    }
+  }, [fullState.network, wallet])
+
+  const switchNetwork = useCallback(() => {
+    if (window.ethereum) {
+      window.ethereum
+        .request({
+          method: 'wallet_addEthereumChain',
+          params: [configs.network],
+        })
+        .catch((error: any) => {
+          changeState({
+            network: {
+              ...fullState.network,
+              error,
+            },
+          })
+        })
+    }
+  }, [fullState.network])
+
+  // on wallet initialized
+  useEffect(() => {
+    if (wallet.status === 'connected' && wallet.account && tokenP) {
+      tokenP
+        .balanceOf(wallet.account)
+        .then(balance => changeState({
+          balances: {
+            ...fullState.balances,
+            P: {
+              amount: balance.toString(),
+              decimals: 18,
+              display: 'TODO', // TODO
+            }, // ethers.utils.formatEther(balance).replace(/(\.\d{3})\d+$/, '$1'),
+          },
+        }))
+        .catch((e) => {
+          console.error(e)
+        })
     }
     /* eslint-disable-next-line react-hooks/exhaustive-deps */
-  }, [wallet.account])
+  }, [wallet.status])
+
+  // update default provider
+  useEffect(() => {
+    if (wallet.status === 'connected') {
+      const { ethereum } = wallet
+      const provider = new ethers.providers.Web3Provider(ethereum as ExternalProvider)
+      const signer = provider.getSigner().connectUnchecked()
+      changeState({
+        ...fullState,
+        network: {
+          ...fullState.network,
+          providers: {
+            ...fullState.network.providers,
+            web3: provider,
+          },
+          defaultProvider: signer,
+          isReadOnly: false,
+        },
+      })
+    } else if (fullState.network.defaultProvider !== fullState.network.providers.readonly) {
+      changeState({
+        ...fullState,
+        network: {
+          ...fullState.network,
+          defaultProvider: fullState.network.providers.readonly,
+          isReadOnly: true,
+        },
+      })
+    }
+    /* eslint-disable-next-line react-hooks/exhaustive-deps */
+  }, [wallet.status])
 
   return {
     ...fullState,
     wallet,
     actions: {
-      debug(props: any) {
-        changeState({ debug: props })
-      },
-      async setConnection(method: keyof Connectors | '') {
-        if (method !== '') {
-          try {
-            await wallet.connect(method)
-            const external = new ethers.providers.Web3Provider(wallet.ethereum as ExternalProvider)
-            changeState({
-              network: {
-                ...fullState.network,
-                isReadOnly: false,
-                defaultProvider: external,
-                error: null,
-                providers: {
-                  ...fullState.network.providers,
-                  external,
-                },
-              },
-            })
-          } catch (error) {
-            changeState({
-              network: {
-                ...fullState.network,
-                isReadOnly: true,
-                defaultProvider: fullState.network.providers.jsonRpc,
-                error,
-              }
-            })
-          }
-        } else {
-          changeState({
-            network: {
-              ...fullState.network,
-              isReadOnly: true,
-              defaultProvider: fullState.network.providers.jsonRpc,
-            },
-          })
-        }
-      },
-
-      switchNetwork() {
-        if (window.ethereum) {
-          window.ethereum
-            .request({
-              method: 'wallet_addEthereumChain',
-              params: [configs.network],
-            })
-            .catch((error: any) => {
-              changeState({
-                network: {
-                  ...fullState.network,
-                  error,
-                },
-              })
-            })
-        }
-      },
+      play,
+      setConnection,
+      switchNetwork,
     },
   }
 }

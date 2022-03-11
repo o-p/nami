@@ -1,6 +1,7 @@
-import { useState } from 'react'
+import { useCallback, useState } from 'react'
 import styled from 'styled-components'
 import Box, { BoxProps } from '@mui/material/Box'
+import { ethers } from 'ethers'
 
 import { ImageObject } from 'slot-machine'
 import { Layers } from './images'
@@ -8,6 +9,8 @@ import useDApp from 'contexts/Web3'
 import Bets from './Bets'
 import Reel from './Reel'
 import StartButton from './StartButton'
+
+const debug = require('debug')('planet-master:slot-machine')
 
 const Layer = styled(function ImageLayer({ className, images, title = '' }: {
     className?: string
@@ -55,15 +58,37 @@ function RNG() {
 }
 
 export default function SlotMachine(props: BoxProps) {
-  // const { wallet } = useDApp()
+  const { actions, wallet: { balance } } = useDApp()
   // const { balance } = wallet as { balance: string }
   const [slots, setSlots] = useState({
     spinning: false,
     stops: RNG(),
   })
 
+  const tt = Number(ethers.utils.formatEther(balance ?? 0))
+
   const [betAmount, chooseBetAmount] = useState(0)
   // TODO useMount => betAmount == 0 => 自動 choose 最大
+
+  const play = useCallback(async () => {
+    setSlots({ ...slots, spinning: true })
+
+    actions
+      .play(betAmount)
+      .then(({ symbols, payment, tokenReward }: {
+        symbols: number[]
+        payment: string
+        tokenReward: string
+      }) => {
+        debug('result: [%d, %d, %d] <TT: %s, P: %s>', ...symbols, payment, tokenReward)
+        setSlots({ stops: symbols, spinning: false })
+      })
+      .catch((e: Error) => {
+        console.error(e)
+        setSlots({ stops: [0, 2, 4], spinning: false })
+      })
+      /* eslint-disable-next-line react-hooks/exhaustive-deps */
+  }, [slots, betAmount, actions.play])
 
   return (
     <Box
@@ -136,16 +161,19 @@ export default function SlotMachine(props: BoxProps) {
             >
               <Bets
                 amount="5"
+                disabled={tt < 5}
                 selected={betAmount === 5}
                 onClick={() => chooseBetAmount(5) }
               />
               <Bets
                 amount="10"
+                disabled={tt < 10}
                 selected={betAmount === 10}
                 onClick={() => chooseBetAmount(10) }
               />
               <Bets
                 amount="50"
+                disabled={tt < 50}
                 selected={betAmount === 50}
                 onClick={() => chooseBetAmount(50) }
               />
@@ -160,16 +188,19 @@ export default function SlotMachine(props: BoxProps) {
             >
               <Bets
                 amount="100"
+                disabled={tt < 100}
                 selected={betAmount === 100}
                 onClick={() => chooseBetAmount(100) }
               />
               <Bets
                 amount="500"
+                disabled={tt < 500}
                 selected={betAmount === 500}
                 onClick={() => chooseBetAmount(500) }
               />
               <Bets
                 amount="1000"
+                disabled={tt < 1000}
                 selected={betAmount === 1000}
                 onClick={() => chooseBetAmount(1000) }
               />
@@ -186,11 +217,8 @@ export default function SlotMachine(props: BoxProps) {
             overflow="hidden"
           >
             <StartButton
-              disabled={betAmount === 0 /* TODO 檢查 balance */ }
-              onClick={() => setSlots({
-                spinning: !slots.spinning,
-                stops: slots.spinning ? RNG() : slots.stops,
-              })}
+              disabled={betAmount === 0 /* TODO 檢查 balance */ || slots.spinning }
+              onClick={play}
             />
           </Box>{/* /Start */}
         </Box>

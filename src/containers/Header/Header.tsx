@@ -8,7 +8,9 @@ import { useDApp } from 'contexts/Web3'
 import ConnectButton from './ConnectButton'
 
 import ImageTT from './images/TT.png'
-import ImagePDT from './images/PDT.png'
+import ImageP from './images/P.png'
+
+console.log(ImageP)
 
 const IconTT = styled.img.attrs({
   src: ImageTT,
@@ -18,8 +20,8 @@ const IconTT = styled.img.attrs({
   display: inline-block;
   vertical-align: bottom;
 `
-const IconPDT = styled.img.attrs({
-  src: ImagePDT,
+const IconP = styled.img.attrs({
+  src: ImageP,
 })`
   width: 20px;
   height: 20px;
@@ -37,6 +39,13 @@ export default function Header(props: BoxProps) {
                   .replace(/(\.\d{3})\d+$/, '$1')
     )
   ), [balance])
+
+  const balanceP = useMemo(() => (
+    ethers.utils.commify(
+      ethers.utils.formatEther(balances.P?.amount ?? '0')
+                  .replace(/(\.\d{3})\d+$/, '$1')
+    )
+  ), [balances.P])
 
   return (
     <Box
@@ -66,8 +75,8 @@ export default function Header(props: BoxProps) {
             <IconTT />
           </Typography>
           <Typography variant="balance" component="p">
-            { balances.PDT ?? 0 }
-            <IconPDT />
+            { balanceP }
+            <IconP />
           </Typography>
         </Box>{/* /Balances */}
       </Box>

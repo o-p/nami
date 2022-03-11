@@ -11,7 +11,7 @@ import configs, { config } from 'configs'
 import useMount from 'hooks/useMount'
 import useGlobalStates, { AppGlobalState } from './useGlobalStates'
 
-const debug = require('debug')('planet-master:context:web3')
+const debug = require('debug')('planet-master:web3-context')
 
 export const context = createContext<AppGlobalState>({
   configs,

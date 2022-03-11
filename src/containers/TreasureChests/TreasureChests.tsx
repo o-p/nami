@@ -16,11 +16,11 @@ function TreasureChests() {
             <Typography variant="treasureHints">
               Choose a box to win the jackpot!
               <br />
-              <small>This will cost you 100 $DPT.</small>
+              <small>This will cost you 6 $P.</small>
             </Typography>)
           : (
             <Typography variant="treasureHints" mb={2}>
-              Opening Jackbox needs 100 $DPT.
+              Opening Jackbox needs 6 $P.
               <br />
               Keep playing to win more token!
             </Typography>)

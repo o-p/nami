@@ -15,19 +15,22 @@
     }
   },
   "token": {
-    "PDT": {
-      "address": "0x08815234Ff45d53450d7c8f102BE698d27A1E4Ca",
-      "name": "Dice Planet",
-      "symbol": "DP",
+    "P": {
+      "address": "0x2386782D5c48294d6F6bb4790D7E66B34c02c4B7",
+      "name": "Planet Token",
+      "symbol": "P",
       "decimals": 18
     },
     "WTT": {
-      "address": "0x390127E81EDe57CFa1e65eA9A96bD68A59D0a099"
+      "address": "0x390127E81EDe57CFa1e65eA9A96bD68A59D0a099",
+      "name": "Wrapped Thunder Token",
+      "symbol": "wTT",
+      "decimals": 18
     }
   },
   "contract": {
-    "Vault": "0x55B46E5123174fA4d93DCB075F4Aa53f02bE6cc1",
-    "SlotMachine": "0x83E623072f687a5b1eb106344BDa3b30f2b7bd7F",
+    "Vault": "0xAbF47E2cb3f848C33a0F6359FF00B87d6Db2C7aA",
+    "SlotMachine": "0xBe9670C79Aa7F5D0Ad8f2fd3bebb08c65e618D24",
     "Multicall": "0x7818a6A0fFe134b2aF30850DCE7c86A52eC6AC4F",
     "Multicall2": "0x02C5503dd793cC457a1CE50d2d31a749cb5e9cB5"
   }
