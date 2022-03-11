@@ -75,6 +75,7 @@ export default function Reel({ shift, spinning, ...boxProps }: ReelProps & BoxPr
     } else {
       setDistance(rand(2, 2))
     }
+    /* eslint-disable-next-line react-hooks/exhaustive-deps */
   }, [spinning])
 
   return (

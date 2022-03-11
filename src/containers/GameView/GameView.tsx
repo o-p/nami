@@ -11,7 +11,7 @@ import MenuButton from 'components/MenuButton'
 import SlotMachine from 'components/SlotMachine'
 import Header from 'containers/Header'
 import TreasureChests from 'containers/TreasureChests'
-import useDApp from 'contexts/Web3'
+// import useDApp from 'contexts/Web3'
 
 import './GameView.scss'
 

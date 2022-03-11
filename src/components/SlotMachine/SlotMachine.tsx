@@ -99,6 +99,7 @@ export default function SlotMachine(props: BoxProps) {
       chooseBetAmount(0)
       return
     }
+    /* eslint-disable-next-line react-hooks/exhaustive-deps */
   }, [tt])
 
   return (

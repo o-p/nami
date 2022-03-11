@@ -19,14 +19,3 @@ export function getContract(
   }
   return new ethers.Contract(address, ABI, getProviderOrSigner(library))
 }
-
-export function getReadContract(
-  address: string,
-  ABI: any,
-  library: any
-): Contract {
-  if (!isAddress(address) || address === ethers.constants.AddressZero) {
-    throw Error(`Invalid 'address' parameter '${address}'.`)
-  }
-  return new ethers.Contract(address, ABI, library)
-}
