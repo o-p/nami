@@ -89,20 +89,21 @@ export default function useGlobalStates() {
   const play = useCallback(async (bet: number) => {
     if (wallet.status !== 'connected') throw new Error('Unable to play game before connecting')
 
-    console.log('bet amount: ', ethers.utils.parseEther(bet.toString()))
+    debug('Play -- bet amount: %d', bet)
+
     const { wait } = await game?.play({
       value: ethers.utils.parseEther(bet.toString()),
     })
 
     const { events } = await wait(1)
 
-    debug('Play slot-machine, got events: %o', events)
+    debug('Play -- receive events: %o', events)
 
     const event = events.find(({ event }: { event: string }) => event === 'Play')
 
     // Contract didn't emit Play event correctly.
     // One possible reason could be the Vault liquidity too low.
-    if (!event) throw new Error('Play failure, please try again.')
+    if (!event) throw new Error('Transaction failure, please try again.')
 
     const {
       args: {

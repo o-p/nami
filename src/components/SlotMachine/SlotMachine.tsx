@@ -1,6 +1,7 @@
-import { useCallback, useState, useEffect } from 'react'
+import { useCallback, useState, useEffect, useRef, useMemo } from 'react'
 import styled from 'styled-components'
 import Box, { BoxProps } from '@mui/material/Box'
+import Slide from '@mui/material/Slide'
 import { ethers } from 'ethers'
 
 import { ImageObject } from 'slot-machine'
@@ -9,6 +10,7 @@ import useDApp from 'contexts/Web3'
 import Bets from './Bets'
 import Reel from './Reel'
 import StartButton from './StartButton'
+import Lightening from 'components/Ligntening'
 
 const debug = require('debug')('planet-master:slot-machine')
 
@@ -42,8 +44,8 @@ const Score = styled.h3`
   text-align: center;
   z-index: 100;
   color: #FFF;
-  max-width: 428px;
-  padding: 0 12%;
+  max-width: 330px;
+  padding: 0 8px;
   margin: 0;
   font-size: 24px;
   line-height: 38px;
@@ -57,12 +59,47 @@ function RNG() {
   ]
 }
 
+const EarnedReward = styled.h3`
+  text-align: center;
+  z-index: 100;
+  color: #FF0;
+  max-width: 330px;
+  padding: 0 8px;
+  margin: 0;
+  font-size: 24px;
+  line-height: 38px;
+`
+
+const ErrorMessage = styled.h3`
+  text-align: center;
+  z-index: 100;
+  color: #A33;
+  max-width: 330px;
+  padding: 0 8px;
+  margin: 0;
+  font-size: 12px;
+  line-height: 38px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+`
+
+interface LastResult {
+  tt: string
+  dp: string
+  error?: Error
+  show: boolean
+}
+
 export default function SlotMachine(props: BoxProps) {
+  const [showLightening, setLighteningEffect] = useState<boolean>(false)
+  const [lastResult, setLastResult] = useState<LastResult>({ tt: '', dp: '', show: false })
   const { actions, wallet: { balance } } = useDApp()
   const [slots, setSlots] = useState({
     spinning: false,
     stops: RNG(),
   })
+  const message = useRef(null)
 
   const tt = Number(ethers.utils.formatEther(balance ?? 0))
 
@@ -70,6 +107,7 @@ export default function SlotMachine(props: BoxProps) {
 
   const play = useCallback(async () => {
     setSlots({ ...slots, spinning: true })
+    setLastResult({ tt: '', dp: '', show: false })
 
     actions
       .play(betAmount)
@@ -79,11 +117,14 @@ export default function SlotMachine(props: BoxProps) {
         tokenReward: string
       }) => {
         debug('result: [%d, %d, %d] <TT: %s, P: %s>', ...symbols, payment, tokenReward)
+        setLighteningEffect(true)
         setSlots({ stops: symbols, spinning: false })
+        setLastResult({ tt: payment, dp: tokenReward, show: true })
       })
       .catch((e: Error) => {
         console.error(e)
         setSlots({ stops: [0, 2, 4], spinning: false })
+        setLastResult({ tt: '', dp: '', show: true, error: e })
       })
       /* eslint-disable-next-line react-hooks/exhaustive-deps */
   }, [slots, betAmount, actions.play])
@@ -101,6 +142,20 @@ export default function SlotMachine(props: BoxProps) {
     }
     /* eslint-disable-next-line react-hooks/exhaustive-deps */
   }, [tt])
+
+  const hideLightening = useCallback(() => setLighteningEffect(false), [])
+  const Message = useMemo(() => {
+    if (lastResult.error) {
+      return <ErrorMessage>{
+        lastResult.error.message ?? lastResult.error.toString()
+      }</ErrorMessage>
+    } else if (lastResult.tt) {
+      return <EarnedReward>+ { lastResult.tt } TT</EarnedReward>
+    } else if (lastResult.dp) {
+      return <EarnedReward>+ { lastResult.dp } P</EarnedReward>
+    }
+    return <Score>PLAY!</Score>
+  }, [lastResult])
 
   return (
     <Box
@@ -132,7 +187,24 @@ export default function SlotMachine(props: BoxProps) {
           flexDirection="column"
           alignItems="center"
         >
-          <Score>SCORE</Score>
+          <Box
+            ref={message}
+            width={330}
+            height={38}
+            overflow="hidden"
+            position="relative"
+          >
+            <Slide
+              in={lastResult.show}
+              container={message.current}
+              direction="up"
+              mountOnEnter
+              unmountOnExit
+            >
+              { Message }
+            </Slide>
+            <Score>SCORE</Score>
+          </Box>
           {/* Reels */}
           <Box
             width={340}
@@ -229,10 +301,17 @@ export default function SlotMachine(props: BoxProps) {
             overflow="hidden"
           >
             <StartButton
-              disabled={betAmount === 0 /* TODO 檢查 balance */ || slots.spinning }
+              disabled={betAmount === 0 || tt < betAmount || slots.spinning}
               onClick={play}
             />
           </Box>{/* /Start */}
+          <Lightening
+            show={showLightening}
+            onHide={hideLightening}
+            position="absolute"
+            zIndex={100}
+            bottom={0}
+          />
         </Box>
       </Box>
     </Box>

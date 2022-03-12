@@ -11,9 +11,11 @@ import MenuButton from 'components/MenuButton'
 import SlotMachine from 'components/SlotMachine'
 import Header from 'containers/Header'
 import TreasureChests from 'containers/TreasureChests'
-// import useDApp from 'contexts/Web3'
+import useDApp from 'contexts/Web3'
 
 import './GameView.scss'
+
+// TODO ligntening effect!!
 
 const DisconnectedOverlay = styled.img.attrs({
   src: grayscaled.x1,
@@ -37,10 +39,12 @@ const Transition = forwardRef<unknown, SlideProps>(function Transition(props, re
   return <Slide direction="up" ref={ref} {...props} />
 })
 
+const OPEN_TREASURE_AMOUNT = '600000000000000000'
+
 function GameView() {
-  // const { error, balances } = useDApp()
+  const { balances } = useDApp()
   const [showChests, setChestsModal] = useState(false)
-  const hasTreasure = false // balance.P.amount.gte() Math.random() > 0.5
+  const hasTreasure = balances.P?.amount.gte(OPEN_TREASURE_AMOUNT) ?? false
 
   return (
     <Container
