@@ -6,11 +6,12 @@ import { ethers } from 'ethers'
 
 import { ImageObject } from 'slot-machine'
 import { Layers } from './images'
-import useDApp from 'contexts/Web3'
 import Bets from './Bets'
+import Lightening from 'components/Ligntening'
 import Reel from './Reel'
 import StartButton from './StartButton'
-import Lightening from 'components/Ligntening'
+import ScoreInfo from './ScoreInfo'
+import useDApp from 'contexts/Web3'
 
 const debug = require('debug')('planet-master:slot-machine')
 
@@ -49,6 +50,7 @@ const Score = styled.h3`
   margin: 0;
   font-size: 24px;
   line-height: 38px;
+  cursor: help;
 `
 const SYMBOL_COUNTS = 5
 function RNG() {
@@ -93,6 +95,7 @@ interface LastResult {
 
 export default function SlotMachine(props: BoxProps) {
   const [showLightening, setLighteningEffect] = useState<boolean>(false)
+
   const [lastResult, setLastResult] = useState<LastResult>({ tt: '', dp: '', show: false })
   const { actions, wallet: { balance } } = useDApp()
   const [slots, setSlots] = useState({
@@ -203,7 +206,7 @@ export default function SlotMachine(props: BoxProps) {
             >
               { Message }
             </Slide>
-            <Score>SCORE</Score>
+            <ScoreInfo />
           </Box>
           {/* Reels */}
           <Box

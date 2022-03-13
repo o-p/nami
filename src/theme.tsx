@@ -28,7 +28,9 @@ export const theme = createTheme({
     // secondary?: PaletteColorOptions;
     // error?: PaletteColorOptions;
     // warning?: PaletteColorOptions;
-    // info?: PaletteColorOptions;
+    info: {
+      main: '#FFF',
+    },
     // success?: PaletteColorOptions;
     // mode?: PaletteMode;
     // tonalOffset?: PaletteTonalOffset;

@@ -15,8 +15,6 @@ import useDApp from 'contexts/Web3'
 
 import './GameView.scss'
 
-// TODO ligntening effect!!
-
 const DisconnectedOverlay = styled.img.attrs({
   src: grayscaled.x1,
   srcSet: `

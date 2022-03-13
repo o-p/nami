@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react'
+import React, { useCallback, useMemo, useState } from 'react'
 import Box, { BoxProps } from '@mui/material/Box'
 import styled from 'styled-components'
 import Typography from '@mui/material/Typography'
@@ -6,6 +6,7 @@ import Typography from '@mui/material/Typography'
 import { useDApp } from 'contexts/Web3'
 import ConnectButton from './ConnectButton'
 import formatWei from 'utils/formatWei'
+import Tokenomic from 'components/ImageDialog/Tokenomic'
 
 import ImageTT from './images/TT.png'
 import ImageP from './images/P.png'
@@ -27,11 +28,17 @@ const IconP = styled.img.attrs({
 
 const formatCurrency = formatWei()
 
+const dpBalanceStyle = { cursor: 'help' }
+
 export default function Header(props: BoxProps) {
+  const [showTokenomics, setTokenomicDialog] = useState(false)
   const { configs, wallet, balances } = useDApp()
 
   const { balance } = wallet as { balance: string }
   const balanceTT = useMemo(() => formatCurrency(balance), [balance])
+
+  const openTokenomicDialog = useCallback(() => setTokenomicDialog(true), [])
+  const closeTokenomicDialog = useCallback(() => setTokenomicDialog(false), [])
 
   return (
     <Box
@@ -60,12 +67,18 @@ export default function Header(props: BoxProps) {
             { balanceTT }
             <IconTT />
           </Typography>
-          <Typography variant="balance" component="p">
+          <Typography
+            variant="balance"
+            component="p"
+            onClick={openTokenomicDialog}
+            sx={dpBalanceStyle}
+          >
             { balances?.P?.display ?? '0.00' }
             <IconP />
           </Typography>
         </Box>{/* /Balances */}
       </Box>
+      <Tokenomic open={showTokenomics} onClose={closeTokenomicDialog} />
     </Box>
   )
 }
