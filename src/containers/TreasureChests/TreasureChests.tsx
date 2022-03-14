@@ -3,12 +3,13 @@ import React, { useCallback, useState } from 'react'
 import { ethers } from 'ethers'
 import { styled } from '@mui/material/styles'
 import Box from '@mui/material/Box'
-import ButtonBase, { ButtonBaseProps } from '@mui/material/ButtonBase'
+import ButtonBase from '@mui/material/ButtonBase'
 import Typography from '@mui/material/Typography'
 
 import ApproveButton from 'components/ApproveButton'
 import Chest from 'components/TreasureChest'
 import useDApp from 'contexts/Web3'
+import PrizeText from './PrizeText'
 
 const Button = styled(ButtonBase)({
   width: 140,
@@ -16,7 +17,6 @@ const Button = styled(ButtonBase)({
   position: 'relative',
   borderRadius: 30,
 })
-
 
 interface OpenStatus {
   isOpening: boolean
@@ -31,8 +31,12 @@ function OpeningChestButton({ status }: ChestButtonProps) {
   const variant = status.isOpening
     ? 'locked'
     : (status.won ? 'full' : 'empty')
+
   return (
     <Button disabled>
+      {
+        status.won ? <PrizeText text={status.won} size={130} /> : null
+      }
       <Chest
         size={120}
         variant={variant}
@@ -90,7 +94,7 @@ function TreasureChests() {
         setOpenStatus({ openIndex: -1, isOpening: false, won: '' })
       })
       .then(refreshGameInfo)
-  }, [unbox, acculatedPrize])
+  }, [unbox, acculatedPrize, refreshGameInfo])
 
   if (dpAllowance.lt(unboxFee)) {
     return (

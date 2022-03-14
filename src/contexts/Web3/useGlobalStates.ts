@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useReducer } from 'react'
+import { useState, useCallback, useEffect, useMemo, useReducer, useRef } from 'react'
 import { useWallet, Connectors, Wallet } from 'use-wallet'
 import { BigNumber, BigNumberish, ethers } from 'ethers'
 import { ExternalProvider } from '@ethersproject/providers'
@@ -83,7 +83,15 @@ function useClientWallet() {
 }
 
 const formatP = formatWei()
+const REFRESH_TIMEOUT = 10000
 export default function useGlobalStates() {
+  const refreshStatus = useRef({
+    lastUpdate: 0,
+    lastAutoUpdate: 0,
+    lastUpdateSuccess: false,
+  })
+  const [lastAutoRefresh, triggerAutoRefresh] = useState(0)
+
   const wallet = useClientWallet()
   const [fullState, changeState] = useReducer((full: AppGlobalState, changes: Partial<AppGlobalState>) => ({
     ...full,
@@ -244,6 +252,8 @@ export default function useGlobalStates() {
   }, [fullState.network.defaultProvider])
 
   const refreshGameInfo = useCallback(() => {
+    const { current } = refreshStatus
+
     const gameAddress = fullState.configs.contract.SlotMachine
     const dpAddress = fullState.configs.token.P.address
 
@@ -280,7 +290,7 @@ export default function useGlobalStates() {
       ).then(([[unboxFee]]) => ({ unboxFee }))
       : Promise.resolve(null)
 
-    Promise
+    return Promise
       .all([
         fullState.network.providers.readonly.getBalance(gameAddress),
         multiCallOfDP,
@@ -311,6 +321,13 @@ export default function useGlobalStates() {
           },
         })
       )
+      .then(() => {
+        current.lastUpdate = Date.now()
+        current.lastUpdateSuccess = true
+      })
+      .catch(() => {
+        current.lastUpdateSuccess = false
+      })
     /* eslint-disable-next-line react-hooks/exhaustive-deps */
   }, [fullState.network.defaultProvider])
 
@@ -351,7 +368,25 @@ export default function useGlobalStates() {
     /* eslint-disable-next-line react-hooks/exhaustive-deps */
   }, [wallet.status])
 
-  // TODO auto refresh game info
+  // auto refresh
+  useEffect(() => {
+    if (!document.hidden
+      && refreshStatus.current.lastUpdate + REFRESH_TIMEOUT < Date.now()
+    ) {
+      refreshGameInfo()
+        .then(() => {
+          refreshStatus.current.lastAutoUpdate = Date.now()
+        })
+    }
+    /* eslint-disable-next-line react-hooks/exhaustive-deps */
+  }, [lastAutoRefresh])
+
+  useEffect(() => {
+    const timer = window.setInterval(() => {
+      triggerAutoRefresh(Date.now())
+    }, REFRESH_TIMEOUT)
+    return () => window.clearInterval(timer)
+  }, [])
 
   return {
     ...fullState,

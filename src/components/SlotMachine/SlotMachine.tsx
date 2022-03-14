@@ -129,6 +129,7 @@ export default function SlotMachine(props: BoxProps) {
         setSlots({ stops: [0, 2, 4], spinning: false })
         setLastResult({ tt: '', dp: '', show: true, error: e })
       })
+      .then(actions.refreshGameInfo)
       /* eslint-disable-next-line react-hooks/exhaustive-deps */
   }, [slots, betAmount, actions.play])
 
