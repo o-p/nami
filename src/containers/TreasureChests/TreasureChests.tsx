@@ -4,8 +4,11 @@ import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
 
 import Chest from 'components/TreasureChest'
+import useDApp from 'contexts/Web3'
 
 function TreasureChests() {
+  const dapp = useDApp()
+  console.log(dapp)
   const [canOpen] = useState(Math.random() > 0.5)
 
   return (

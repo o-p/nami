@@ -1,3 +1,4 @@
+import { JsonFragment } from '@ethersproject/abi'
 import { ethers, Contract } from 'ethers'
 
 export type MultiCallResponse<T> = T | null
@@ -20,7 +21,7 @@ interface MulticallOptions {
  */
 export const multicallv2 = async <T = any>(
   multiCallContract: Contract | undefined,
-  abi: any[],
+  abi: JsonFragment[],
   calls: Call[],
   options: MulticallOptions = { requireSuccess: true },
 ): Promise<MultiCallResponse<T>> => {

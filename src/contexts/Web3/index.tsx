@@ -16,6 +16,10 @@ const debug = require('debug')('planet-master:web3-context')
 export const context = createContext<AppGlobalState>({
   configs,
   balances: {},
+  game: {
+    dpAllowance: ethers.constants.Zero,
+    acculatedPrize: ethers.constants.Zero,
+  },
   network: {},
   wallet: {},
   actions: {},

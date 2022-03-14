@@ -9,7 +9,7 @@ const createWeiFormatter = (decimals = 18, floatPoints = 2, commify = true) =>
       ] = Number(ethers.utils.formatUnits(bn, decimals))
             .toFixed(floatPoints)
             .split('.')
-      return `${ethers.utils.commify(intPart)}.${floatPart}`
+      return floatPart ? `${ethers.utils.commify(intPart)}.${floatPart}` : ethers.utils.commify(intPart)
     }
     : (bn: BigNumberish) => Number(ethers.utils.formatUnits(bn, decimals)).toFixed(floatPoints)
 

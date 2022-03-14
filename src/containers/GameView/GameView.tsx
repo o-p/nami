@@ -1,10 +1,11 @@
-import React, { useState, forwardRef } from 'react'
-import styled from 'styled-components'
+import React, { useState, forwardRef, useCallback } from 'react'
+import { ethers } from 'ethers'
 import Box from '@mui/material/Box'
 import Container from '@mui/material/Container'
 import Dialog from '@mui/material/Dialog'
 import Fade from '@mui/material/Fade'
 import Slide, { SlideProps } from '@mui/material/Slide'
+import styled from 'styled-components'
 
 import { grayscaled } from './images'
 import MenuButton from 'components/MenuButton'
@@ -12,6 +13,7 @@ import SlotMachine from 'components/SlotMachine'
 import Header from 'containers/Header'
 import TreasureChests from 'containers/TreasureChests'
 import useDApp from 'contexts/Web3'
+import formatWei from 'utils/formatWei'
 
 import './GameView.scss'
 
@@ -38,11 +40,18 @@ const Transition = forwardRef<unknown, SlideProps>(function Transition(props, re
 })
 
 const OPEN_TREASURE_AMOUNT = '600000000000000000'
-
+const formatPrize = formatWei(18, 0)
 function GameView() {
-  const { balances } = useDApp()
-  const [showChests, setChestsModal] = useState(false)
+  const { balances, game } = useDApp()
+  const [showTreasures, setTreasureView] = useState(false)
   const hasTreasure = balances.P?.amount.gte(OPEN_TREASURE_AMOUNT) ?? false
+
+  const openTreasureView = useCallback(() => setTreasureView(true), [])
+  const closeTreasureView = useCallback(() => setTreasureView(false), [])
+
+  const prize = game.acculatedPrize.gt(ethers.constants.WeiPerEther)
+    ? `Over ${formatPrize(game.acculatedPrize)} TT`
+    : ''
 
   return (
     <Container
@@ -58,14 +67,15 @@ function GameView() {
       >
         <MenuButton
           disabled={!hasTreasure}
-          onClick={() => setChestsModal(true)}
+          prize={prize}
+          onClick={openTreasureView}
         />
       </Box>
       <Dialog
         fullWidth
         maxWidth="sm"
-        open={showChests}
-        onClose={() => setChestsModal(false)}
+        open={showTreasures}
+        onClose={closeTreasureView}
         TransitionComponent={Transition}
         PaperProps={{
           sx: {
