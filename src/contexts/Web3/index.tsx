@@ -19,6 +19,7 @@ export const context = createContext<AppGlobalState>({
   game: {
     dpAllowance: ethers.constants.Zero,
     acculatedPrize: ethers.constants.Zero,
+    unboxFee: ethers.constants.WeiPerEther.mul(6),
   },
   network: {},
   wallet: {},

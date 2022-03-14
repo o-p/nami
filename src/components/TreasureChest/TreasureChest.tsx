@@ -1,10 +1,20 @@
-import styled from 'styled-components'
+import styled, { keyframes } from 'styled-components'
 
 import Image from './images'
+
+const shaking = keyframes`
+  35% { transform: rotateZ(0); }
+  40% { transform: rotateZ(10deg); }
+  50% { transform: rotateZ(-10deg); }
+  60% { transform: rotateZ(10deg); }
+  70% { transform: rotateZ(-10deg); }
+  75% { transform: rotateZ(0); }
+`
 
 interface TreasureChestProps {
   variant?: 'disabled' | 'empty' | 'full' | 'locked'
   size?: number
+  opening?: boolean
 }
 
 const variants = {
@@ -28,6 +38,8 @@ const TreasureChest = styled.img.attrs<TreasureChestProps>((props) => {
 })<TreasureChestProps>`
   width: ${props => props.size ?? 64}px;
   height: ${props => props.size ?? 64}px;
+  animation: ${shaking} 1s infinite;
+  ${ props => props.opening ? '' : 'animation: none;' }
 `
 
 export default TreasureChest

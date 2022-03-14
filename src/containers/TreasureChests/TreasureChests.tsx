@@ -1,15 +1,110 @@
-import React, { useState } from 'react'
+import React, { useCallback, useState } from 'react'
 
+import { ethers } from 'ethers'
+import { styled } from '@mui/material/styles'
 import Box from '@mui/material/Box'
+import ButtonBase, { ButtonBaseProps } from '@mui/material/ButtonBase'
 import Typography from '@mui/material/Typography'
 
+import ApproveButton from 'components/ApproveButton'
 import Chest from 'components/TreasureChest'
 import useDApp from 'contexts/Web3'
 
+const Button = styled(ButtonBase)({
+  width: 140,
+  height: 140,
+  position: 'relative',
+  borderRadius: 30,
+})
+
+
+interface OpenStatus {
+  isOpening: boolean
+  openIndex: number
+  won: string
+}
+interface ChestButtonProps {
+  status: OpenStatus
+  onClick: () => void
+}
+function OpeningChestButton({ status }: ChestButtonProps) {
+  const variant = status.isOpening
+    ? 'locked'
+    : (status.won ? 'full' : 'empty')
+  return (
+    <Button disabled>
+      <Chest
+        size={120}
+        variant={variant}
+        opening={status.isOpening}
+      />
+    </Button>
+  )
+}
+
+function RestChestButton({ status, onClick }: ChestButtonProps) {
+  const disabled = status.openIndex !== -1
+  return (
+    <Button
+      disabled={disabled}
+      onClick={onClick}
+    >
+      <Chest size={120} variant={ disabled ? 'disabled' : 'locked' } />
+    </Button>
+  )
+}
+
 function TreasureChests() {
-  const dapp = useDApp()
-  console.log(dapp)
-  const [canOpen] = useState(Math.random() > 0.5)
+  const [openStatus, setOpenStatus] = useState<OpenStatus>({
+    isOpening: false,
+    openIndex: -1,
+    won: '',
+  })
+  const {
+    configs: { token: { P: { decimals } } },
+    balances,
+    game: {
+      acculatedPrize,
+      dpAllowance,
+      unboxFee,
+    },
+    actions: {
+      approveDP,
+      refreshGameInfo,
+      unbox,
+    },
+  } = useDApp()
+
+  // TODO Loading effect
+  const approve = useCallback(
+    () => approveDP().then(refreshGameInfo),
+    [approveDP, refreshGameInfo]
+  )
+
+  const choose = useCallback((index: number) => () => {
+    setOpenStatus({ openIndex: index, isOpening: true, won: '' })
+    unbox(acculatedPrize)
+      .then(({ win: won }: { win: string }) => setOpenStatus({ openIndex: index, isOpening: false, won }))
+      .catch((e: any) => {
+        console.error(e)
+        setOpenStatus({ openIndex: -1, isOpening: false, won: '' })
+      })
+      .then(refreshGameInfo)
+  }, [unbox, acculatedPrize])
+
+  if (dpAllowance.lt(unboxFee)) {
+    return (
+      <>
+        <Typography variant="treasureHints">
+          Approve spending $P for opening treasure boxes.
+        </Typography>)
+        <ApproveButton onClick={approve} />
+      </>
+    )
+  }
+
+  const canOpen = (balances?.P?.amount ?? ethers.constants.Zero).gte(unboxFee)
+  const cost = ethers.utils.formatUnits(unboxFee, decimals)
 
   return (
     <>
@@ -19,11 +114,11 @@ function TreasureChests() {
             <Typography variant="treasureHints">
               Choose a box to win the jackpot!
               <br />
-              <small>This will cost you 6 $P.</small>
+              <small>This will cost you {cost} $P.</small>
             </Typography>)
           : (
             <Typography variant="treasureHints" mb={2}>
-              Opening Jackbox needs 6 $P.
+              Opening Jackbox needs {cost} $P.
               <br />
               Keep playing to win more token!
             </Typography>)
@@ -36,7 +131,11 @@ function TreasureChests() {
           justifyContent="center"
           alignItems="end"
         >
-          <Chest size={120} variant="full" />
+          {
+            openStatus.openIndex === 0
+              ? <OpeningChestButton status={openStatus} onClick={choose(0)} />
+              : <RestChestButton status={openStatus} onClick={choose(0)} />
+          }
         </Box>
         <Box
           height={150}
@@ -45,8 +144,16 @@ function TreasureChests() {
           justifyContent="space-between"
           alignItems="end"
         >
-          <Chest size={120} variant="empty" />
-          <Chest size={120} variant="locked" />
+          {
+            openStatus.openIndex === 1
+              ? <OpeningChestButton status={openStatus} onClick={choose(1)} />
+              : <RestChestButton status={openStatus} onClick={choose(1)} />
+          }
+          {
+            openStatus.openIndex === 2
+              ? <OpeningChestButton status={openStatus} onClick={choose(2)} />
+              : <RestChestButton status={openStatus} onClick={choose(2)} />
+          }
         </Box>
       </Box>
     </>

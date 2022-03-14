@@ -6,7 +6,7 @@ import { ContractTransaction } from '@ethersproject/contracts'
 
 import configs, { config } from 'configs'
 import useThunderHub from './useThunderHub'
-import { useMulticall2, useP, useSlotMachine, ERC20, PlayEvent, UnboxEvent } from './contracts'
+import { useMulticall2, useP, useSlotMachine, ERC20, SlotMachine, PlayEvent, UnboxEvent } from './contracts'
 import formatWei from 'utils/formatWei'
 import { multicallv2 } from 'utils/multicall'
 
@@ -24,6 +24,7 @@ export interface AppGlobalState {
   game: {
     dpAllowance: BigNumber
     acculatedPrize: BigNumber
+    unboxFee: BigNumber
   }
   network: any
   wallet: Wallet<unknown> | {
@@ -45,6 +46,7 @@ const initState: AppGlobalState = {
   game: {
     dpAllowance: ethers.constants.Zero,
     acculatedPrize: ethers.constants.Zero,
+    unboxFee: ethers.constants.WeiPerEther.mul(6),
   },
   network: {
     defaultProvider: readonly,
@@ -132,9 +134,9 @@ export default function useGlobalStates() {
 
     return {
       symbols: [
-        left.toNumber(),
-        mid.toNumber(),
-        right.toNumber(),
+        fullState.configs.game.symbolMappings[left.toString()],
+        fullState.configs.game.symbolMappings[mid.toString()],
+        fullState.configs.game.symbolMappings[right.toString()],
       ],
       payment: ethers.utils.formatEther(payment),
       tokenReward: ethers.utils.formatEther(tokenReward),
@@ -146,7 +148,7 @@ export default function useGlobalStates() {
     if (wallet.status !== 'connected') throw new Error('Unable to unbox before connecting')
     if (!game) throw new Error('Contract disconnected')
 
-    debug('Unbox -- current prize: %d', prize)
+    debug('Unbox -- current prize: %s', prize.toString())
 
     const { wait } = await game?.unbox(prize)
 
@@ -264,12 +266,27 @@ export default function useGlobalStates() {
       ).then(([[balanceOf], [allowance]]) => ({ balanceOf, allowance }))
       : Promise.resolve(null)
 
+    const multiCallofGame = theMultiCall
+      ? multicallv2(
+        theMultiCall,
+        SlotMachine,
+        [
+          {
+            address: gameAddress,
+            name: 'unboxingFee',
+            params: [],
+          }
+        ]
+      ).then(([[unboxFee]]) => ({ unboxFee }))
+      : Promise.resolve(null)
+
     Promise
       .all([
         fullState.network.providers.readonly.getBalance(gameAddress),
         multiCallOfDP,
+        multiCallofGame,
       ])
-      .then(([acculatedPrize, dpInfo]) => dpInfo
+      .then(([acculatedPrize, dpInfo, gameInfo]) => dpInfo
         ? changeState({
           balances: {
             ...fullState.balances,
@@ -283,12 +300,14 @@ export default function useGlobalStates() {
             ...fullState.game,
             dpAllowance: dpInfo.allowance,
             acculatedPrize,
+            unboxFee: gameInfo?.unboxFee,
           },
         })
         : changeState({
           game: {
             ...fullState.game,
             acculatedPrize,
+            unboxFee: gameInfo?.unboxFee,
           },
         })
       )
