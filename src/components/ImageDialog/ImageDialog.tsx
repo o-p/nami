@@ -1,12 +1,12 @@
 import { forwardRef } from 'react'
 
 import styled from 'styled-components'
+import Box from '@mui/material/Box'
 import Dialog from '@mui/material/Dialog'
-import DialogTitle from '@mui/material/DialogTitle'
-import DialogContent from '@mui/material/DialogContent'
 import Grow, { GrowProps } from '@mui/material/Grow'
 
 import CloseButton from 'components/CloseButton'
+import { ImageContentProps, ImageDialogProps } from './image-dialog'
 
 const Transition = forwardRef<unknown, GrowProps>(function Transition(props, ref) {
   return <Grow ref={ref} {...props} />
@@ -15,7 +15,8 @@ const Transition = forwardRef<unknown, GrowProps>(function Transition(props, ref
 const ImageContent = styled.div<ImageContentProps>`
   background-image: url(${props => props.image});
   width: 100%;
-  height: 60vh;
+  height: 600px;
+  max-height: 90vh;
   background-size: contain;
   background-position: center top;
   background-repeat: no-repeat;
@@ -28,12 +29,7 @@ const DialogPaperProps = {
   },
 }
 
-const DialogTitleStyles = {
-  textAlign: 'right',
-  padding: 0,
-}
-
-export default function ImageDialog({ open, onClose, image }: ImageDialogProps) {
+export default function ImageDialog({ open, onClose, image, CloseButtonProps }: ImageDialogProps) {
   return (
     <Dialog
       fullWidth
@@ -43,14 +39,17 @@ export default function ImageDialog({ open, onClose, image }: ImageDialogProps) 
       TransitionComponent={Transition}
       PaperProps={DialogPaperProps}
     >
-      <DialogTitle sx={DialogTitleStyles}>
+      <Box
+        position="absolute"
+        right={0}
+        top={0}
+        {...CloseButtonProps}
+      >
         <CloseButton
           onClick={onClose as () => void}
         />
-      </DialogTitle>
-      <DialogContent>
-        <ImageContent image={image} />
-      </DialogContent>
+      </Box>
+      <ImageContent image={image} />
     </Dialog>
   )
 }

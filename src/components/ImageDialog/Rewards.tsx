@@ -1,10 +1,19 @@
 import ImageDialog from './ImageDialog'
 
+import { WrappedImageDialogProps } from './image-dialog'
 /* eslint-disable-next-line import/no-webpack-loader-syntax */
-import image from '!!file-loader!./reward-sheet.gif'
+import image from '!!file-loader!./reward-sheet.png'
 
-// TODO 獎勵 & 機率表
-
+const closeButtonProps = {
+  top: 60,
+  right: 32,
+}
 export default function Rewards(props: WrappedImageDialogProps) {
-  return <ImageDialog {...props} image={image} />
+  return (
+    <ImageDialog
+      CloseButtonProps={closeButtonProps}
+      {...props}
+      image={image}
+    />
+  )
 }

@@ -341,7 +341,7 @@ export default function useGlobalStates() {
         if (gameAcculatedPrize.callsReturnContext[0].success) game.acculatedPrize = ethers.BigNumber.from(gameAcculatedPrize.callsReturnContext[0].returnValues[0])
 
         const [allowance, balanceOfP] = P?.callsReturnContext ?? []
-        if (allowance?.success) game.dpAllowance = allowance.returnValues[0]
+        if (allowance?.success) game.dpAllowance = ethers.BigNumber.from(allowance.returnValues[0])
         if (balanceOfP?.success) Object.assign(balanceP, { amount: ethers.BigNumber.from(balanceOfP.returnValues[0]), display: formatToken(balanceOfP.returnValues[0]) })
 
         const [balanceOfTT] = TT?.callsReturnContext ?? []

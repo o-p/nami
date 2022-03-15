@@ -1,16 +1,19 @@
 import IconButton, { IconButtonProps } from '@mui/material/IconButton';
-import CloseIcon from '@mui/icons-material/Close'
+import styled from 'styled-components'
+
+import btn from './close.png'
+
+const CloseIcon = styled.img.attrs({
+  src: btn,
+})`
+  width: 44px;
+  height: 44px;
+`
 
 export default function CloseButton(props: IconButtonProps) {
   return (
-    <IconButton
-      sx={{ padding: 0 }}
-      {...props}
-    >
-      <CloseIcon
-        color="info"
-        fontSize="large"
-      />
+    <IconButton {...props}>
+      <CloseIcon />
     </IconButton>
   )
 }

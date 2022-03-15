@@ -8,6 +8,7 @@ import Slide, { SlideProps } from '@mui/material/Slide'
 import styled from 'styled-components'
 
 import { grayscaled } from './images'
+import CloseButton from 'components/CloseButton'
 import MenuButton from 'components/MenuButton'
 import SlotMachine from 'components/SlotMachine'
 import Header from 'containers/Header'
@@ -39,12 +40,20 @@ const Transition = forwardRef<unknown, SlideProps>(function Transition(props, re
   return <Slide direction="up" ref={ref} {...props} />
 })
 
-const OPEN_TREASURE_AMOUNT = '600000000000000000'
+
 const formatPrize = formatWei(18, 0)
+const dialogPaperProps = {
+  sx: {
+    backgroundColor: 'transparent',
+    boxShadow: 'none',
+  },
+}
+
 function GameView() {
   const { balances, game } = useDApp()
   const [showTreasures, setTreasureView] = useState(false)
-  const hasTreasure = balances.P?.amount?.gte(OPEN_TREASURE_AMOUNT) ?? false
+  const hasTreasure = (game?.unboxFee?.gt(0) ?? false)
+    && (balances.P?.amount?.gte(game.unboxFee) ?? false)
 
   const openTreasureView = useCallback(() => setTreasureView(true), [])
   const closeTreasureView = useCallback(() => setTreasureView(false), [])
@@ -77,13 +86,11 @@ function GameView() {
         open={showTreasures}
         onClose={closeTreasureView}
         TransitionComponent={Transition}
-        PaperProps={{
-          sx: {
-            backgroundColor: 'transparent',
-            boxShadow: 'none',
-          },
-        }}
+        PaperProps={dialogPaperProps}
       >
+        <Box display="flex" justifyContent="end">
+          <CloseButton onClick={closeTreasureView} />
+        </Box>
         <TreasureChests />
       </Dialog>
 
