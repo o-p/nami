@@ -33,7 +33,7 @@ const Button = styled(ButtonBase)({
   width: '100%',
   height: '200px',
 
-  '&:hover': {
+  '&:hover, &:active, &:focus': {
     '.dragon': {
       transform: `translateX(360px) rotateZ(635deg)`,
       transition: `transform .15s ease-in .08s`,
