@@ -33,6 +33,7 @@ export interface AppGlobalState {
       display: string
     }
   }
+  error?: Error | string | null
   game: {
     dpAllowance: BigNumber
     acculatedPrize: BigNumber
@@ -140,7 +141,9 @@ export default function useGlobalStates() {
     const event = events.find(({ event }) => event === 'Play')
 
     // Contract didn't emit Play event correctly.
-    // One possible reason could be the Vault liquidity too low.
+    // Possible reasons:
+    //   - could be the Vault liquidity too low.
+    //   - out of gas
     if (!event) throw new Error('Transaction failure, please try again.')
 
     const {
@@ -382,6 +385,9 @@ export default function useGlobalStates() {
     /* eslint-disable-next-line react-hooks/exhaustive-deps */
   }, [fullState.network.defaultProvider])
 
+  const showError = useCallback((error: Error | string) => changeState({ error }), [])
+  const clearError = useCallback(() => changeState({ error: null }), [])
+
   // on wallet initialized
   useEffect(() => {
     refreshGameInfo()
@@ -451,6 +457,8 @@ export default function useGlobalStates() {
       play,
       approveDP,
       unbox,
+      showError,
+      clearError,
     },
   }
 }

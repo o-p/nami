@@ -1,6 +1,6 @@
 import React from 'react'
 
-import styledComp from 'styled-components'
+import styledComp, { keyframes } from 'styled-components'
 import ButtonBase, { ButtonBaseProps } from '@mui/material/ButtonBase'
 import { styled } from '@mui/material/styles'
 
@@ -18,14 +18,38 @@ const Dragon = styledComp.img.attrs({
   z-index: 55;
 `
 
+const glowing = keyframes`
+  0% {
+    box-shadow: 0 0 0 #FBB616;
+    filter: drop-shadow(2px 4px 6px #F00);
+  }
+
+  25% { filter: drop-shadow(4px 0 6px #880); }
+
+  50% {
+    box-shadow: 0 0 10px #FBB616;
+    filter: drop-shadow(0 -2px 6px #0F0);
+  }
+
+  75% { filter: drop-shadow(-2px 0 6px #880); }
+
+  100% {
+    box-shadow: 0 0 0 #FBB616;
+    filter: drop-shadow(2px 4px 6px #F00);
+  }
+`
+
 const Token = styledComp.img.attrs({
   src: ImageToken,
 })`
   position: absolute;
-  top: 20px;
+  top: 30px;
   left: 80px;
   width: 100px;
   z-index: 50;
+  border-radius: 50%;
+  animation: ${glowing} 3s infinite;
+  animation: none;
 `
 
 const Button = styled(ButtonBase)({
@@ -41,15 +65,24 @@ const Button = styled(ButtonBase)({
       transition: `transform .15s ease-in .08s`,
     },
     '.token': {
-      transform: `translateX(85px) scale3d(1.3, 1.3, 1)`,
+      transform: `translateX(85px) translateY(20px) scale3d(1.3, 1.3, 1)`,
       transition: `transform .15s ease-in`,
+    },
+  },
+
+  '&.approving': {
+    '.dragon': {
+      opacity: 0,
+    },
+    '.token': {
+      animation: `${glowing.getName()} 5s infinite`,
     },
   },
 })
 
-export default function ApproveButton(props: ButtonBaseProps) {
+export default function ApproveButton({ approving, ...props }: { approving: boolean } & ButtonBaseProps) {
   return (
-    <Button {...props}>
+    <Button className={ approving ? 'approving': '' } {...props}>
       <Dragon className="dragon" />
       <Token className="token" />
     </Button>

@@ -21,7 +21,6 @@ export const theme = createTheme({
         }
       },
     },
-    //
   },
   palette: {
     // primary?: PaletteColorOptions;

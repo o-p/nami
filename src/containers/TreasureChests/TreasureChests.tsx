@@ -59,6 +59,7 @@ function RestChestButton({ status, onClick }: ChestButtonProps) {
 }
 
 function TreasureChests() {
+  const [approving, setApproving] = useState<boolean>(false)
   const [openStatus, setOpenStatus] = useState<OpenStatus>({
     isOpening: false,
     openIndex: -1,
@@ -76,12 +77,23 @@ function TreasureChests() {
       approveDP,
       refreshGameInfo,
       unbox,
+      showError,
     },
   } = useDApp()
 
-  // TODO Loading effect
   const approve = useCallback(
-    () => approveDP().then(refreshGameInfo),
+    () => {
+      setApproving(true)
+
+      approveDP()
+        .catch((e: any) => {
+          showError(e.message ?? e.toString())
+        })
+        .then(() => setApproving(false))
+        .then(refreshGameInfo)
+
+    },
+    /* eslint-disable-next-line react-hooks/exhaustive-deps */
     [approveDP, refreshGameInfo]
   )
 
@@ -91,9 +103,11 @@ function TreasureChests() {
       .then(({ win: won }: { win: string }) => setOpenStatus({ openIndex: index, isOpening: false, won }))
       .catch((e: any) => {
         console.error(e)
+        showError(e.message ?? e.toString())
         setOpenStatus({ openIndex: -1, isOpening: false, won: '' })
       })
       .then(refreshGameInfo)
+  /* eslint-disable-next-line react-hooks/exhaustive-deps */
   }, [unbox, acculatedPrize, refreshGameInfo])
 
   if (dpAllowance.lt(unboxFee)) {
@@ -102,7 +116,7 @@ function TreasureChests() {
         <Typography variant="treasureHints">
           Approve spending $P for opening treasure boxes.
         </Typography>)
-        <ApproveButton onClick={approve} />
+        <ApproveButton onClick={approve} approving={approving} />
       </>
     )
   }

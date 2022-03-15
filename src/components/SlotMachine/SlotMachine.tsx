@@ -1,6 +1,6 @@
 import { useCallback, useState, useEffect, useRef, useMemo } from 'react'
 import styled from 'styled-components'
-import Box, { BoxProps } from '@mui/material/Box'
+import Box from '@mui/material/Box'
 import Slide from '@mui/material/Slide'
 import { ethers } from 'ethers'
 
@@ -126,6 +126,7 @@ export default function SlotMachine() {
       })
       .catch((e: Error) => {
         console.error(e)
+        actions.showError(e.message ?? e.toString())
         setSlots({ stops: initReels, spinning: false })
         setLastResult({ tt: '', dp: '', show: true, error: e })
       })
