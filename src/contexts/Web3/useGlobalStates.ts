@@ -153,6 +153,13 @@ export default function useGlobalStates() {
       },
     } = event as PlayEvent
 
+    debug(
+      'Play -- %s | %s | %s',
+      fullState.configs.game.symbolNames[left.toString()],
+      fullState.configs.game.symbolNames[mid.toString()],
+      fullState.configs.game.symbolNames[right.toString()],
+    )
+
     return {
       symbols: [
         fullState.configs.game.symbolMappings[left.toString()],

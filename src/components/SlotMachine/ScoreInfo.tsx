@@ -18,6 +18,7 @@ const Score = styled.h3`
   user-select: none;
 `
 
+const iconSx = { marginLeft: '8px' }
 export default function ScoreInfo() {
   const [showRewards, setRewardDialog] = useState<boolean>(false)
 
@@ -28,7 +29,7 @@ export default function ScoreInfo() {
     <Box>
       <Score onClick={showRewardDialog}>
         SCORE
-        <InfoIcon fontSize="small" sx={{ marginLeft: '8px' }} />
+        <InfoIcon fontSize="small" sx={iconSx} />
       </Score>
       <Rewards open={showRewards} onClose={hideRewardDialog} />
     </Box>

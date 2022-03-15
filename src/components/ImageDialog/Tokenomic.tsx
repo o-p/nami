@@ -6,6 +6,6 @@ import image from '!!file-loader!./tokenomic.png'
 
 // TODO Token Distribution 圖
 
-export default function Rewards(props: WrappedImageDialogProps) {
+export default function Tokenomic(props: WrappedImageDialogProps) {
   return <ImageDialog {...props} image={image} />
 }

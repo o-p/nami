@@ -53,13 +53,11 @@ const Score = styled.h3`
   cursor: help;
 `
 const SYMBOL_COUNTS = 5
-function RNG() {
-  return [
-    Math.floor(Math.random() * SYMBOL_COUNTS),
-    Math.floor(Math.random() * SYMBOL_COUNTS),
-    Math.floor(Math.random() * SYMBOL_COUNTS),
-  ]
-}
+const initReels = [
+  Math.floor(Math.random() * SYMBOL_COUNTS),
+  Math.floor(Math.random() * SYMBOL_COUNTS),
+  Math.floor(Math.random() * SYMBOL_COUNTS),
+]
 
 const EarnedReward = styled.h3`
   text-align: center;
@@ -93,14 +91,14 @@ interface LastResult {
   show: boolean
 }
 
-export default function SlotMachine(props: BoxProps) {
+export default function SlotMachine() {
   const [showLightening, setLighteningEffect] = useState<boolean>(false)
 
   const [lastResult, setLastResult] = useState<LastResult>({ tt: '', dp: '', show: false })
   const { actions, wallet: { balance }, balances: { TT } } = useDApp()
   const [slots, setSlots] = useState({
     spinning: false,
-    stops: RNG(),
+    stops: initReels,
   })
   const message = useRef(null)
 
@@ -108,9 +106,11 @@ export default function SlotMachine(props: BoxProps) {
 
   const [betAmount, chooseBetAmount] = useState(0)
 
+  const clear = useCallback(() => setLastResult({ tt: '', dp: '', show: false }), [])
+
   const play = useCallback(async () => {
     setSlots({ ...slots, spinning: true })
-    setLastResult({ tt: '', dp: '', show: false })
+    clear()
 
     actions
       .play(betAmount)
@@ -126,7 +126,7 @@ export default function SlotMachine(props: BoxProps) {
       })
       .catch((e: Error) => {
         console.error(e)
-        setSlots({ stops: [0, 2, 4], spinning: false })
+        setSlots({ stops: initReels, spinning: false })
         setLastResult({ tt: '', dp: '', show: true, error: e })
       })
       .then(actions.refreshGameInfo)
@@ -197,6 +197,7 @@ export default function SlotMachine(props: BoxProps) {
             height={38}
             overflow="hidden"
             position="relative"
+            onClick={clear}
           >
             <Slide
               in={lastResult.show}
