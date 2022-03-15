@@ -12,6 +12,7 @@
     "@web3-react/injected-connector": "^6.0.7",
     "@web3-react/walletconnect": "^8.0.1-beta.0",
     "date-fns": "^2.23.0",
+    "ethereum-multicall": "^2.10.0",
     "ethers": "^5.0.32",
     "jwt-decode": "^3.1.2",
     "lodash": "^4.17.21",

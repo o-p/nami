@@ -4,11 +4,23 @@ import { BigNumber, BigNumberish, ethers } from 'ethers'
 import { ExternalProvider } from '@ethersproject/providers'
 import { ContractTransaction } from '@ethersproject/contracts'
 
+import {
+  Multicall,
+  ContractCallContext,
+} from 'ethereum-multicall';
+
 import configs, { config } from 'configs'
 import useThunderHub from './useThunderHub'
-import { useMulticall2, useP, useSlotMachine, ERC20, SlotMachine, PlayEvent, UnboxEvent } from './contracts'
+import {
+  PlayEvent,
+  UnboxEvent,
+  useP,
+  useSlotMachine,
+  ERC20 as AbiERC20,
+  Multicall2 as AbiMulticall2,
+  SlotMachine as AbiGame,
+} from './contracts'
 import formatWei from 'utils/formatWei'
-import { multicallv2 } from 'utils/multicall'
 
 const debug = require('debug')('planet-master:use-global-states')
 
@@ -82,13 +94,15 @@ function useClientWallet() {
   )
 }
 
-const formatP = formatWei()
+const formatToken = formatWei()
 const REFRESH_TIMEOUT = 10000
 export default function useGlobalStates() {
   const refreshStatus = useRef({
+    fetching: false,
     lastUpdate: 0,
     lastAutoUpdate: 0,
     lastUpdateSuccess: false,
+    lastAccount: '',
   })
   const [lastAutoRefresh, triggerAutoRefresh] = useState(0)
 
@@ -104,11 +118,9 @@ export default function useGlobalStates() {
   }
 
   const game = useSlotMachine(fullState.network.defaultProvider) as null | {
-    play: (settings: { value: BigNumberish }) => Promise<ContractTransaction>
-    unbox: (prize: BigNumberish) => Promise<ContractTransaction>
+    play: (settings?: { value: BigNumberish, gasLimit: BigNumberish }) => Promise<ContractTransaction>
+    unbox: (prize: BigNumberish, settings?: { gasLimit: BigNumberish }) => Promise<ContractTransaction>
   }
-
-  const theMultiCall = useMulticall2(fullState.network.providers.readonly)
 
   const play = useCallback(async (bet: number) => {
     if (wallet.status !== 'connected') throw new Error('Unable to play game before connecting')
@@ -118,6 +130,7 @@ export default function useGlobalStates() {
 
     const { wait } = await game?.play({
       value: ethers.utils.parseEther(bet.toString()),
+      gasLimit: 500000,
     })
 
     const { events = [] } = await wait(1)
@@ -158,7 +171,9 @@ export default function useGlobalStates() {
 
     debug('Unbox -- current prize: %s', prize.toString())
 
-    const { wait } = await game?.unbox(prize)
+    const { wait } = await game?.unbox(prize, {
+      gasLimit: 500000,
+    })
 
     const { events = [] } = await wait(1)
 
@@ -255,78 +270,107 @@ export default function useGlobalStates() {
     const { current } = refreshStatus
 
     const gameAddress = fullState.configs.contract.SlotMachine
-    const dpAddress = fullState.configs.token.P.address
+    const tokenAddress = fullState.configs.token.P.address
+    const userAddress = wallet.account ?? ''
+    const multicallAddress = fullState.configs.contract.Multicall2
 
-    const multiCallOfDP = wallet.status === 'connected' && wallet.account && tokenP && theMultiCall
-      ? multicallv2(
-        theMultiCall,
-        ERC20,
-        [
-          {
-            address: dpAddress,
-            name: 'balanceOf',
-            params: [wallet.account],
-          },
-          {
-            address: dpAddress,
-            name: 'allowance',
-            params: [wallet.account, gameAddress],
-          },
+    // if (current.fetching) return Promise.reject('fetching')
+    if (
+      Date.now() - current.lastUpdate < 1000
+      && current.lastUpdateSuccess
+      && current.lastAccount === userAddress
+    ) return Promise.reject('too soon')
+
+    const multicall = new Multicall({
+      ethersProvider: fullState.network.providers.readonly,
+      tryAggregate: true,
+      multicallCustomContractAddress: multicallAddress,
+    })
+
+    const requests: ContractCallContext[] = [
+      {
+        reference: 'gameUnboxFee',
+        contractAddress: gameAddress,
+        abi: AbiGame,
+        calls: [{ reference: 'unboxingFee', methodName: 'unboxingFee', methodParameters: [] }],
+      },
+      {
+        reference: 'gameAcculatedPrize',
+        abi: AbiMulticall2,
+        contractAddress: multicallAddress,
+        calls: [
+          { reference: 'game', methodName: 'getEthBalance', methodParameters: [gameAddress] },
         ],
-      ).then(([[balanceOf], [allowance]]) => ({ balanceOf, allowance }))
-      : Promise.resolve(null)
+      }
+    ]
 
-    const multiCallofGame = theMultiCall
-      ? multicallv2(
-        theMultiCall,
-        SlotMachine,
-        [
-          {
-            address: gameAddress,
-            name: 'unboxingFee',
-            params: [],
-          }
-        ]
-      ).then(([[unboxFee]]) => ({ unboxFee }))
-      : Promise.resolve(null)
+    if (userAddress) {
+      requests.push({
+        reference: 'P',
+        contractAddress: tokenAddress,
+        abi: AbiERC20,
+        calls: [
+          { reference: 'allowance', methodName: 'allowance', methodParameters: [userAddress, gameAddress] },
+          { reference: 'balance', methodName: 'balanceOf', methodParameters: [userAddress] },
+        ],
+      }, {
+        reference: 'TT',
+        abi: AbiMulticall2,
+        contractAddress: multicallAddress,
+        calls: [
+          { reference: 'user', methodName: 'getEthBalance', methodParameters: [userAddress] },
+        ],
+      })
+    }
 
-    return Promise
-      .all([
-        fullState.network.providers.readonly.getBalance(gameAddress),
-        multiCallOfDP,
-        multiCallofGame,
-      ])
-      .then(([acculatedPrize, dpInfo, gameInfo]) => dpInfo
-        ? changeState({
+    Object.assign(current, {
+      fetching: true,
+      lastAccount: userAddress,
+      lastSuccess: false,
+      lastUpdate: Date.now(),
+    })
+
+    return multicall
+      .call(requests)
+      .then(({ results: { gameUnboxFee, gameAcculatedPrize, P, TT } }) => {
+        const game = { ...fullState.game }
+        const balanceP = { ...fullState.balances.P }
+        const balanceTT = { ...fullState.balances.TT }
+
+        if (gameUnboxFee.callsReturnContext[0].success) game.unboxFee = ethers.BigNumber.from(gameUnboxFee.callsReturnContext[0].returnValues[0])
+        if (gameAcculatedPrize.callsReturnContext[0].success) game.acculatedPrize = ethers.BigNumber.from(gameAcculatedPrize.callsReturnContext[0].returnValues[0])
+
+        const [allowance, balanceOfP] = P?.callsReturnContext ?? []
+        if (allowance?.success) game.dpAllowance = allowance.returnValues[0]
+        if (balanceOfP?.success) Object.assign(balanceP, { amount: ethers.BigNumber.from(balanceOfP.returnValues[0]), display: formatToken(balanceOfP.returnValues[0]) })
+
+        const [balanceOfTT] = TT?.callsReturnContext ?? []
+        if (balanceOfTT?.success) Object.assign(balanceTT, { amount: ethers.BigNumber.from(balanceOfTT.returnValues[0]), display: formatToken(balanceOfTT.returnValues[0]) })
+
+        changeState({
+          game,
           balances: {
             ...fullState.balances,
-            P: {
-              amount: dpInfo.balanceOf,
-              decimals: 18,
-              display: formatP(dpInfo.balanceOf),
-            },
-          },
-          game: {
-            ...fullState.game,
-            dpAllowance: dpInfo.allowance,
-            acculatedPrize,
-            unboxFee: gameInfo?.unboxFee,
+            P: balanceP,
+            TT: balanceTT,
           },
         })
-        : changeState({
-          game: {
-            ...fullState.game,
-            acculatedPrize,
-            unboxFee: gameInfo?.unboxFee,
-          },
-        })
-      )
+      })
       .then(() => {
-        current.lastUpdate = Date.now()
-        current.lastUpdateSuccess = true
+        Object.assign(current, {
+          fetching: false,
+          lastAccount: userAddress,
+          lastSuccess: true,
+          lastUpdate: Date.now(),
+        })
       })
       .catch(() => {
-        current.lastUpdateSuccess = false
+        Object.assign(current, {
+          fetching: false,
+          lastAccount: userAddress,
+          lastSuccess: false,
+          lastUpdate: Date.now(),
+        })
       })
     /* eslint-disable-next-line react-hooks/exhaustive-deps */
   }, [fullState.network.defaultProvider])
@@ -334,6 +378,7 @@ export default function useGlobalStates() {
   // on wallet initialized
   useEffect(() => {
     refreshGameInfo()
+      .catch((e) => debug('Refresh game info on initialing failure, error: %s', e))
     /* eslint-disable-next-line react-hooks/exhaustive-deps */
   }, [fullState.network.defaultProvider])
 
@@ -377,6 +422,7 @@ export default function useGlobalStates() {
         .then(() => {
           refreshStatus.current.lastAutoUpdate = Date.now()
         })
+        .catch((e) => debug('Auto refresh failure, error: %s', e))
     }
     /* eslint-disable-next-line react-hooks/exhaustive-deps */
   }, [lastAutoRefresh])

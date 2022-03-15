@@ -64,7 +64,7 @@ export default function Header(props: BoxProps) {
         {/* Balances */}
         <Box paddingX={1}>
           <Typography variant="balance" component="p">
-            { balanceTT }
+            { balances?.TT?.display ?? balanceTT }
             <IconTT />
           </Typography>
           <Typography

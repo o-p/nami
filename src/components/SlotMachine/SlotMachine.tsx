@@ -97,14 +97,14 @@ export default function SlotMachine(props: BoxProps) {
   const [showLightening, setLighteningEffect] = useState<boolean>(false)
 
   const [lastResult, setLastResult] = useState<LastResult>({ tt: '', dp: '', show: false })
-  const { actions, wallet: { balance } } = useDApp()
+  const { actions, wallet: { balance }, balances: { TT } } = useDApp()
   const [slots, setSlots] = useState({
     spinning: false,
     stops: RNG(),
   })
   const message = useRef(null)
 
-  const tt = Number(ethers.utils.formatEther(balance ?? 0))
+  const tt = Number(ethers.utils.formatEther(TT?.amount ?? balance ?? 0))
 
   const [betAmount, chooseBetAmount] = useState(0)
 

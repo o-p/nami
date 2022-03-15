@@ -44,7 +44,7 @@ const formatPrize = formatWei(18, 0)
 function GameView() {
   const { balances, game } = useDApp()
   const [showTreasures, setTreasureView] = useState(false)
-  const hasTreasure = balances.P?.amount.gte(OPEN_TREASURE_AMOUNT) ?? false
+  const hasTreasure = balances.P?.amount?.gte(OPEN_TREASURE_AMOUNT) ?? false
 
   const openTreasureView = useCallback(() => setTreasureView(true), [])
   const closeTreasureView = useCallback(() => setTreasureView(false), [])
