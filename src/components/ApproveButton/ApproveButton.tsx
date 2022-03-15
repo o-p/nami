@@ -22,16 +22,18 @@ const Token = styledComp.img.attrs({
   src: ImageToken,
 })`
   position: absolute;
-  top: 0;
-  left: 100px;
+  top: 20px;
+  left: 80px;
   width: 100px;
   z-index: 50;
 `
 
 const Button = styled(ButtonBase)({
   position: 'relative',
+  maxWidth: '100%',
   width: '100%',
   height: '200px',
+  overflow: 'hidden',
 
   '&:hover, &:active, &:focus': {
     '.dragon': {
