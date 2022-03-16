@@ -24,6 +24,7 @@ interface OpenStatus {
   won: string
 }
 interface ChestButtonProps {
+  disabled?: boolean
   status: OpenStatus
   onClick: () => void
 }
@@ -46,11 +47,11 @@ function OpeningChestButton({ status }: ChestButtonProps) {
   )
 }
 
-function RestChestButton({ status, onClick }: ChestButtonProps) {
-  const disabled = status.openIndex !== -1
+function RestChestButton({ status, onClick, disabled }: ChestButtonProps) {
+  const isDisabled = disabled || status.openIndex !== -1
   return (
     <Button
-      disabled={disabled}
+      disabled={isDisabled}
       onClick={onClick}
     >
       <Chest size={120} variant={ disabled ? 'disabled' : 'locked' } />
@@ -151,8 +152,8 @@ function TreasureChests() {
         >
           {
             openStatus.openIndex === 0
-              ? <OpeningChestButton status={openStatus} onClick={choose(0)} />
-              : <RestChestButton status={openStatus} onClick={choose(0)} />
+              ? <OpeningChestButton status={openStatus} onClick={choose(0)} disabled={!canOpen} />
+              : <RestChestButton status={openStatus} onClick={choose(0)} disabled={!canOpen} />
           }
         </Box>
         <Box
@@ -164,13 +165,13 @@ function TreasureChests() {
         >
           {
             openStatus.openIndex === 1
-              ? <OpeningChestButton status={openStatus} onClick={choose(1)} />
-              : <RestChestButton status={openStatus} onClick={choose(1)} />
+              ? <OpeningChestButton status={openStatus} onClick={choose(1)} disabled={!canOpen} />
+              : <RestChestButton status={openStatus} onClick={choose(1)} disabled={!canOpen} />
           }
           {
             openStatus.openIndex === 2
-              ? <OpeningChestButton status={openStatus} onClick={choose(2)} />
-              : <RestChestButton status={openStatus} onClick={choose(2)} />
+              ? <OpeningChestButton status={openStatus} onClick={choose(2)} disabled={!canOpen} />
+              : <RestChestButton status={openStatus} onClick={choose(2)} disabled={!canOpen} />
           }
         </Box>
       </Box>
