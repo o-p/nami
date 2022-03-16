@@ -68,6 +68,7 @@ const EarnedReward = styled.h3`
   margin: 0;
   font-size: 24px;
   line-height: 38px;
+  cursor: point;
 `
 
 const ErrorMessage = styled.h3`
@@ -89,12 +90,23 @@ interface LastResult {
   dp: string
   error?: Error
   show: boolean
+  emoji: string
 }
+
+const LuckyEmojis: string[] = [
+  `😩 😩 😩`,
+  `🙄`,
+  `💔`,
+  `😱  😱  😱`,
+  `😒`,
+]
+
+const goodLuck = () => LuckyEmojis[Math.floor(Math.random() * LuckyEmojis.length)]
 
 export default function SlotMachine() {
   const [showLightening, setLighteningEffect] = useState<boolean>(false)
 
-  const [lastResult, setLastResult] = useState<LastResult>({ tt: '', dp: '', show: false })
+  const [lastResult, setLastResult] = useState<LastResult>({ tt: '', dp: '', show: false, emoji: '' })
   const { actions, wallet: { balance }, balances: { TT } } = useDApp()
   const [slots, setSlots] = useState({
     spinning: false,
@@ -106,7 +118,7 @@ export default function SlotMachine() {
 
   const [betAmount, chooseBetAmount] = useState(0)
 
-  const clear = useCallback(() => setLastResult({ tt: '', dp: '', show: false }), [])
+  const clear = useCallback(() => setLastResult({ tt: '', dp: '', show: false, emoji: '' }), [])
 
   const play = useCallback(async () => {
     setSlots({ ...slots, spinning: true })
@@ -122,13 +134,13 @@ export default function SlotMachine() {
         debug('result: [%d, %d, %d] <TT: %s, P: %s>', ...symbols, payment, tokenReward)
         setLighteningEffect(true)
         setSlots({ stops: symbols, spinning: false })
-        setLastResult({ tt: payment, dp: tokenReward, show: true })
+        setLastResult({ tt: payment, dp: tokenReward, show: true, emoji: goodLuck() })
       })
       .catch((e: Error) => {
         console.error(e)
         actions.showError(e.message ?? e.toString())
         setSlots({ stops: initReels, spinning: false })
-        setLastResult({ tt: '', dp: '', show: true, error: e })
+        setLastResult({ tt: '', dp: '', show: true, error: e, emoji: '' })
       })
       .then(actions.refreshGameInfo)
       /* eslint-disable-next-line react-hooks/exhaustive-deps */
@@ -154,10 +166,12 @@ export default function SlotMachine() {
       return <ErrorMessage>{
         lastResult.error.message ?? lastResult.error.toString()
       }</ErrorMessage>
-    } else if (lastResult.tt) {
-      return <EarnedReward>+ { lastResult.tt } TT</EarnedReward>
-    } else if (lastResult.dp) {
+    } else if (Number(lastResult.dp) > 0) { // Has last result of TT and earned P
       return <EarnedReward>+ { lastResult.dp } P</EarnedReward>
+    } else if (Number(lastResult.tt) > 0) { // Has last result of TT and earned TT
+      return <EarnedReward>+ { lastResult.tt } TT</EarnedReward>
+    } else if (lastResult.tt) { // Has last result but earned nothing
+      return <Score>{ lastResult.emoji }</Score>
     }
     return <Score>PLAY!</Score>
   }, [lastResult])
