@@ -29,16 +29,24 @@ const ImageSrc = styled.span`
 const ButtonBack = styled(ImageSrc)<{ disabled?: boolean }>`
   background-image: url(${images.charged.x1});
   background-size: 200px;
-  filter: grayscale(${ props => props.disabled ? .5 : 0 });
-  transition: all .15s ease-in ${ props => props.disabled ? '0s' : '0.8s' };
+  transition: all .08s ease-in .7s;
+
+  &.disabled {
+    filter: grayscale(.5);
+    transition: all .08s ease-in;
+  }
 `
 
 const Bottle = styled(ImageSrc)<{ disabled?: boolean }>`
   background-image: url(${images.bottle.x1});
   background-position: 48% 48.5%;
   background-size: 174px;
-  filter: brightness(${props => props.disabled ? 1.5 : 1 }) grayscale(${ props => props.disabled ? .9 : 0 });
-  transition: all .15s ease-in ${ props => props.disabled ? '0s' : '0.6s' };
+  transition: all .15s ease-in .6s;
+
+  &.disabled {
+    filter: brightness(1.5) grayscale(.9);
+    transition: all .1s ease-in;
+  }
 
   &:hover {
     filter: contrast(1.05) brightness(1.04) drop-shadow(0 2px 3px #0006);
@@ -54,8 +62,8 @@ export default function StartButton(props: ButtonBaseProps) {
       }}
       {...props}
     >
-      <ButtonBack disabled={props.disabled} / >
-      <Bottle disabled={props.disabled} />
+      <ButtonBack className={ props.disabled ? 'disabled' : '' } / >
+      <Bottle className={ props.disabled ? 'disabled' : '' } />
     </ImageButton>
   )
 }
