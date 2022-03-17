@@ -31,6 +31,7 @@ const TreasureChest = styled.img.attrs<TreasureChestProps>((props) => {
   return {
     src: img.x1,
     srcSet: `
+      ${img.x1} x1,
       ${img.x2} x2,
       ${img.x3} x3
     `,

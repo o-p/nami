@@ -6,6 +6,7 @@ import { grayscaled } from './images'
 const DisconnectedOverlay = styled.img.attrs({
   src: grayscaled.x1,
   srcSet: `
+    ${grayscaled.x1} 1x,
     ${grayscaled.x2} 2x,
     ${grayscaled.x3} 3x
   `,

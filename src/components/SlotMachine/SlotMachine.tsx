@@ -27,6 +27,7 @@ const Layer = styled(function ImageLayer({ className, images, title = '' }: {
         className={className}
         src={x1}
         srcSet={`
+          ${x1} 1x,
           ${x2} 2x,
           ${x3} 3x
         `}

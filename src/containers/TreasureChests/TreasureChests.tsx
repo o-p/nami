@@ -54,7 +54,7 @@ function RestChestButton({ status, onClick, disabled }: ChestButtonProps) {
       disabled={isDisabled}
       onClick={onClick}
     >
-      <Chest size={120} variant={ disabled ? 'disabled' : 'locked' } />
+      <Chest size={120} variant={ isDisabled ? 'disabled' : 'locked' } />
     </Button>
   )
 }
