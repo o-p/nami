@@ -30,6 +30,7 @@ const ButtonBack = styled(ImageSrc)<{ disabled?: boolean }>`
   background-image: url(${images.charged.x1});
   background-size: 200px;
   filter: grayscale(${ props => props.disabled ? .5 : 0 });
+  transition: all .15s ease-in ${ props => props.disabled ? '0s' : '0.8s' };
 `
 
 const Bottle = styled(ImageSrc)<{ disabled?: boolean }>`
@@ -37,6 +38,7 @@ const Bottle = styled(ImageSrc)<{ disabled?: boolean }>`
   background-position: 48% 48.5%;
   background-size: 174px;
   filter: brightness(${props => props.disabled ? 1.5 : 1 }) grayscale(${ props => props.disabled ? .9 : 0 });
+  transition: all .15s ease-in ${ props => props.disabled ? '0s' : '0.6s' };
 
   &:hover {
     filter: contrast(1.05) brightness(1.04) drop-shadow(0 2px 3px #0006);
