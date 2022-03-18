@@ -64,8 +64,9 @@ export const theme = createTheme({
       },
     },
     balance: {
-      fontFamily: `'VT323', monospace`,
-      fontSize: 20,
+      fontFamily: `'Nova Mono', monospace`,
+      fontWeight: 400,
+      fontSize: 14,
       textAlign: 'right',
       lineHeight: 1.5,
       color: '#000',

@@ -5,6 +5,7 @@ import { styled } from '@mui/material/styles'
 import { useDApp } from 'contexts/Web3'
 
 const Button = styled(ButtonBase)({
+  fontFamily: `'Nova Mono', monospace`,
   backgroundColor: '#FFF9',
   borderRadius: 9,
   border: '1px solid #FFFA',
