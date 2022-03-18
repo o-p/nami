@@ -6,7 +6,7 @@ const createWeiFormatter = (decimals = 18, floatPoints = 2, commify = true) =>
       const [
         intPart,
         floatPart,
-      ] = Number(ethers.utils.formatUnits(bn, decimals))
+      ] = Math.max(Number(ethers.utils.formatUnits(bn, decimals)), 0)
             .toFixed(floatPoints)
             .split('.')
       return floatPart ? `${ethers.utils.commify(intPart)}.${floatPart}` : ethers.utils.commify(intPart)

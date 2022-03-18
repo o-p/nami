@@ -77,15 +77,19 @@ export default function Header(props: BoxProps) {
         {/* Balances */}
         <Box paddingX={1} paddingY={2}>
           <Typography variant="balance" component="p">
-            { balances?.TT?.display ?? balanceTT }
             <IconTT />
+            &nbsp;
+            { balances?.TT?.display ?? balanceTT }
+            &nbsp;TT
           </Typography>
           <Typography
             variant="balance"
             component="p"
           >
-            { balances?.P?.display ?? '0.00' }
             <IconP onClick={addToWallet} />
+            &nbsp;
+            { balances?.P?.display ?? '0.000' }
+            &nbsp;PMT
           </Typography>
         </Box>{/* /Balances */}
       </Box>

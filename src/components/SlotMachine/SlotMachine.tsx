@@ -168,7 +168,7 @@ export default function SlotMachine() {
         lastResult.error.message ?? lastResult.error.toString()
       }</ErrorMessage>
     } else if (Number(lastResult.dp) > 0) { // Has last result of TT and earned P
-      return <EarnedReward>+ { lastResult.dp } P</EarnedReward>
+      return <EarnedReward>+ { lastResult.dp } PMT</EarnedReward>
     } else if (Number(lastResult.tt) > 0) { // Has last result of TT and earned TT
       return <EarnedReward>+ { lastResult.tt } TT</EarnedReward>
     } else if (lastResult.tt) { // Has last result but earned nothing
@@ -228,26 +228,27 @@ export default function SlotMachine() {
           </Box>
           {/* Reels */}
           <Box
-            width={340}
+            width={330}
             height={196}
             zIndex={30}
             overflow="hidden"
             display="flex"
+            justifyContent="space-between"
           >
             <Reel
               spinning={slots.spinning}
               shift={slots.stops[0]}
-              flex="30%"
+              flex="32% 0 0"
             />
             <Reel
               spinning={slots.spinning}
               shift={slots.stops[1]}
-              flex="30%"
+              flex="32% 0 0"
             />
             <Reel
               spinning={slots.spinning}
               shift={slots.stops[2]}
-              flex="30%"
+              flex="32% 0 0"
             />
           </Box>{/* /Reels */}
 
@@ -265,12 +266,6 @@ export default function SlotMachine() {
               justifyContent="space-evenly"
             >
               <Bets
-                amount="5"
-                disabled={tt < 5}
-                selected={betAmount === 5}
-                onClick={() => chooseBetAmount(5) }
-              />
-              <Bets
                 amount="10"
                 disabled={tt < 10}
                 selected={betAmount === 10}
@@ -282,6 +277,12 @@ export default function SlotMachine() {
                 selected={betAmount === 50}
                 onClick={() => chooseBetAmount(50) }
               />
+              <Bets
+                amount="100"
+                disabled={tt < 100}
+                selected={betAmount === 100}
+                onClick={() => chooseBetAmount(100) }
+              />
             </Box>
             <Box
               height={58}
@@ -291,12 +292,6 @@ export default function SlotMachine() {
               alignItems="center"
               justifyContent="space-evenly"
             >
-              <Bets
-                amount="100"
-                disabled={tt < 100}
-                selected={betAmount === 100}
-                onClick={() => chooseBetAmount(100) }
-              />
               <Bets
                 amount="500"
                 disabled={tt < 500}
@@ -308,6 +303,12 @@ export default function SlotMachine() {
                 disabled={tt < 1000}
                 selected={betAmount === 1000}
                 onClick={() => chooseBetAmount(1000) }
+              />
+              <Bets
+                amount="3000"
+                disabled={tt < 3000}
+                selected={betAmount === 3000}
+                onClick={() => chooseBetAmount(3000) }
               />
             </Box>
           </Box>{/* /Bets */}
@@ -331,7 +332,7 @@ export default function SlotMachine() {
             onHide={hideLightening}
             position="absolute"
             zIndex={100}
-            bottom={0}
+            bottom={16}
           />
         </Box>
       </Box>

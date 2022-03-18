@@ -115,7 +115,7 @@ function TreasureChests() {
     return (
       <>
         <Typography variant="treasureHints">
-          Approve spending $P for opening treasure boxes.
+          Approve spending $PMT for opening treasure boxes.
         </Typography>)
         <ApproveButton onClick={approve} approving={approving} />
       </>
@@ -137,7 +137,7 @@ function TreasureChests() {
             </Typography>)
           : (
             <Typography variant="treasureHints" mb={2}>
-              Opening Jackbox needs {cost} $P.
+              Opening Jackbox needs {cost} $PMT.
               <br />
               Keep playing to win more token!
             </Typography>)

@@ -12,11 +12,6 @@ import foregroundx2 from '!!file-loader!./foreground@2x.png'
 import foregroundx3 from '!!file-loader!./foreground@3x.png'
 
 ////// BETS //////
-
-import bet0005x1 from '!!file-loader!./bet-0005.png'
-import bet0005x2 from '!!file-loader!./bet-0005@2x.png'
-import bet0005x3 from '!!file-loader!./bet-0005@3x.png'
-
 import bet0010x1 from '!!file-loader!./bet-0010.png'
 import bet0010x2 from '!!file-loader!./bet-0010@2x.png'
 import bet0010x3 from '!!file-loader!./bet-0010@3x.png'
@@ -36,6 +31,10 @@ import bet0500x3 from '!!file-loader!./bet-0500@3x.png'
 import bet1000x1 from '!!file-loader!./bet-1000.png'
 import bet1000x2 from '!!file-loader!./bet-1000@2x.png'
 import bet1000x3 from '!!file-loader!./bet-1000@3x.png'
+
+import bet3000x1 from '!!file-loader!./bet-3000.png'
+import bet3000x2 from '!!file-loader!./bet-3000@2x.png'
+import bet3000x3 from '!!file-loader!./bet-3000@3x.png'
 
 ////// START BUTTON //////
 
@@ -64,12 +63,12 @@ export const StartButton = {
 }
 
 export const Bets = {
-  '5': { x1: bet0005x1, x2: bet0005x2, x3: bet0005x3 },
   '10': { x1: bet0010x1, x2: bet0010x2, x3: bet0010x3 },
   '50': { x1: bet0050x1, x2: bet0050x2, x3: bet0050x3 },
   '100': { x1: bet0100x1, x2: bet0100x2, x3: bet0100x3 },
   '500': { x1: bet0500x1, x2: bet0500x2, x3: bet0500x3 },
   '1000': { x1: bet1000x1, x2: bet1000x2, x3: bet1000x3 },
+  '3000': { x1: bet3000x1, x2: bet3000x2, x3: bet3000x3 },
 } as {
   [key: string]: ImageObject
 }

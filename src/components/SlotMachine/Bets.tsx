@@ -25,10 +25,10 @@ const BetIcons = Object.fromEntries(
 )
 
 interface BetProps extends IconButtonProps {
-  amount: '5' | '10' | '50' | '100' | '500' | '1000'
+  amount: '10' | '50' | '100' | '500' | '1000' | '3000'
   selected?: boolean
 }
-export default function Bets({ amount = '5', selected, ...props }: BetProps) {
+export default function Bets({ amount = '10', selected, ...props }: BetProps) {
   if (props.disabled) {
     return (
       <div>

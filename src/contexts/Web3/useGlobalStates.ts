@@ -95,7 +95,7 @@ function useClientWallet() {
   )
 }
 
-const formatToken = formatWei()
+const formatToken = formatWei(18, 3)
 const REFRESH_TIMEOUT = 10000
 export default function useGlobalStates() {
   const refreshStatus = useRef({
