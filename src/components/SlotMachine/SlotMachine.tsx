@@ -332,7 +332,7 @@ export default function SlotMachine() {
             onHide={hideLightening}
             position="absolute"
             zIndex={100}
-            bottom={16}
+            bottom={48}
           />
         </Box>
       </Box>
