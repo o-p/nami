@@ -131,7 +131,7 @@ export default function useGlobalStates() {
 
     const { wait } = await game?.play({
       value: ethers.utils.parseEther(bet.toString()),
-      gasLimit: 500000,
+      gasLimit: 1000000
     })
 
     const { events = [] } = await wait(1)
@@ -182,7 +182,7 @@ export default function useGlobalStates() {
     debug('Unbox -- current prize: %s', prize.toString())
 
     const { wait } = await game?.unbox(prize, {
-      gasLimit: 500000,
+      gasLimit: 1000000,
     })
 
     const { events = [] } = await wait(1)
