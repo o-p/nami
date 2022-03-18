@@ -75,7 +75,7 @@ export default function Header(props: BoxProps) {
           <ConnectButton />
         </Box>{/* /Connection Button */}
         {/* Balances */}
-        <Box paddingX={1}>
+        <Box paddingX={1} paddingY={2}>
           <Typography variant="balance" component="p">
             { balances?.TT?.display ?? balanceTT }
             <IconTT />

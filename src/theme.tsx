@@ -60,7 +60,7 @@ export const theme = createTheme({
       lineHeight: 1.4,
       textAlign: 'center',
       '& small': {
-        fontSize: 10,
+        fontSize: 18,
       },
     },
     balance: {

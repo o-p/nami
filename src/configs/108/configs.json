@@ -16,7 +16,7 @@
   },
   "token": {
     "P": {
-      "address": "",
+      "address": "0x95c3c8eb5445409fe4a17D7e80696Ab89bBd95ea",
       "name": "Planet Token",
       "symbol": "P",
       "decimals": 18
@@ -29,8 +29,8 @@
     }
   },
   "contract": {
-    "Vault": "",
-    "SlotMachine": "",
+    "Vault": "0x7021fcCed997B757eFA807A3E692e014e72D2638",
+    "SlotMachine": "0x292f9C7E2a9A07929f3cD1E1c35A43e958C7E1EF",
     "Multicall": "0x3017086DeEf56679e267F67F66c4415109b7A97f",
     "Multicall2": "0xd1dC5CF410b227dFEeFEe8D3c1C9DB4FBE66d362"
   }

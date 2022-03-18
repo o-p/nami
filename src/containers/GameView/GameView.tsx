@@ -38,7 +38,7 @@ function GameView() {
   const closeTreasureView = useCallback(() => setTreasureView(false), [])
 
   const prize = game.acculatedPrize.gt(ethers.constants.WeiPerEther)
-    ? `Over ${formatPrize(game.acculatedPrize)} TT`
+    ? `Pool ${formatPrize(game.acculatedPrize)} TT`
     : ''
 
   return (
