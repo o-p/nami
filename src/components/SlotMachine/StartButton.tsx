@@ -41,15 +41,18 @@ const Bottle = styled(ImageSrc)<{ disabled?: boolean }>`
   background-image: url(${images.bottle.x1});
   background-position: 48% 48.5%;
   background-size: 174px;
-  transition: all .15s ease-in .6s;
+  transition: all .35s ease-in .4s;
 
   &.disabled {
+    filter: grayscale(.8);
     filter: brightness(1.5) grayscale(.9);
     transition: all .1s ease-in;
   }
 
   &:hover {
-    filter: contrast(1.05) brightness(1.04) drop-shadow(0 2px 3px #0006);
+    filter: drop-shadow(0 2px 3px #0006);
+    filter: contrast(1.05) brightness(1.08) drop-shadow(0 2px 3px #0009);
+    transition: all .1s ease-in;
   }
 `
 
