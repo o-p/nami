@@ -46,7 +46,7 @@ export default function Header(props: BoxProps) {
           address: token.address,
           symbol: token.symbol,
           decimals: token.decimals,
-          image: `${process.env.PUBLIC_URL}/logo512.png`,
+          image: `${process.env.PUBLIC_URL}/pmt.png`,
         },
       },
     })
