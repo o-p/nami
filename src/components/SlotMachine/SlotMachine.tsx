@@ -60,10 +60,35 @@ const initReels = [
   Math.floor(Math.random() * SYMBOL_COUNTS),
 ]
 
-const EarnedReward = styled.h3`
+const EarnedReward = styled.p`
   text-align: center;
   z-index: 100;
   color: #FF0;
+  max-width: 330px;
+  padding: 0 8px;
+  margin: 0;
+  font-size: 24px;
+  line-height: 38px;
+  cursor: point;
+`
+
+const EarnedRewardSpan = styled.span`
+  text-align: center;
+  z-index: 100;
+  color: #FF0;
+  max-width: 330px;
+  padding: 0 8px;
+  margin: 0;
+  font-size: 24px;
+  line-height: 38px;
+  cursor: point;
+`
+
+
+const TokenReward = styled.p`
+  text-align: center;
+  z-index: 100;
+  color: #FF9D00;
   max-width: 330px;
   padding: 0 8px;
   margin: 0;
@@ -167,10 +192,12 @@ export default function SlotMachine() {
       return <ErrorMessage>{
         lastResult.error.message ?? lastResult.error.toString()
       }</ErrorMessage>
+    } else if (Number(lastResult.dp) > 0 && Number(lastResult.tt) > 0) { // Has last result of TT and earned P
+      return <TokenReward><EarnedRewardSpan>+{ lastResult.tt } TT</EarnedRewardSpan> { lastResult.dp } PMT</TokenReward>
     } else if (Number(lastResult.dp) > 0) { // Has last result of TT and earned P
-      return <EarnedReward>+ { lastResult.dp } PMT</EarnedReward>
+      return <TokenReward>+{ lastResult.dp } PMT</TokenReward>
     } else if (Number(lastResult.tt) > 0) { // Has last result of TT and earned TT
-      return <EarnedReward>+ { lastResult.tt } TT</EarnedReward>
+      return <EarnedReward>+{ lastResult.tt } TT</EarnedReward>
     } else if (lastResult.tt) { // Has last result but earned nothing
       return <Score>{ lastResult.emoji }</Score>
     }
