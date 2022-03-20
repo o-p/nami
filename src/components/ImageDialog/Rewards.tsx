@@ -5,8 +5,8 @@ import { WrappedImageDialogProps } from './image-dialog'
 import image from '!!file-loader!./reward-sheet.png'
 
 const closeButtonProps = {
-  top: 60,
-  right: 32,
+  top: 50,
+  right: 20,
 }
 export default function Rewards(props: WrappedImageDialogProps) {
   return (
