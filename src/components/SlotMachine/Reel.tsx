@@ -64,8 +64,9 @@ function rand(range: number, digits: number) {
 interface ReelProps extends BoxProps {
   shift: number
   spinning: boolean
+  onStop?: () => void
 }
-export default function Reel({ shift, spinning, ...boxProps }: ReelProps & BoxProps) {
+export default function Reel({ shift, spinning, onStop, ...boxProps }: ReelProps & BoxProps) {
   const [counts, setCounts] = useState(0)
   const [distance, setDistance] = useState(rand(2, 2))
 
@@ -90,6 +91,7 @@ export default function Reel({ shift, spinning, ...boxProps }: ReelProps & BoxPr
               shift={shift}
               distance={distance}
               static={!counts}
+              onAnimationEnd={onStop}
             />)
       }
     </Box>

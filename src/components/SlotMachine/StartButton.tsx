@@ -41,7 +41,7 @@ const Bottle = styled(ImageSrc)<{ disabled?: boolean }>`
   background-image: url(${images.bottle.x1});
   background-position: 48% 48.5%;
   background-size: 174px;
-  transition: all .35s ease-in .4s;
+  transition: all .35s ease-in;
 
   &.disabled {
     filter: grayscale(.8);

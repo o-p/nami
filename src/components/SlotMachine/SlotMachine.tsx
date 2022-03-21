@@ -129,8 +129,55 @@ const LuckyEmojis: string[] = [
 
 const goodLuck = () => LuckyEmojis[Math.floor(Math.random() * LuckyEmojis.length)]
 
-export default function SlotMachine() {
+const LEFT_SPINNING = 1 << 2
+const MID_SPINNING = 1 << 1
+const RIGHT_SPINNING = 1
+const useLighteningEffect = () => {
+  const states = useRef(0)
+
   const [showLightening, setLighteningEffect] = useState<boolean>(false)
+  const [
+    onLeftReelStopped,
+    onMidReelStopped,
+    onRightReelStopped,
+  ] = useMemo(() => {
+    const onReelStop = (reel: number) => () => {
+      states.current &= ~reel
+      if (states.current === 0) setLighteningEffect(true)
+    }
+    return [
+      onReelStop(LEFT_SPINNING),
+      onReelStop(MID_SPINNING),
+      onReelStop(RIGHT_SPINNING),
+    ]
+  }, [])
+  const onReelsStart = useCallback(() => {
+    states.current = LEFT_SPINNING | MID_SPINNING | RIGHT_SPINNING
+  }, [])
+
+  const hideLightening = useCallback(() => setLighteningEffect(false), [])
+
+  return {
+    allReelsStopped: states.current === 0,
+    showLightening,
+    hideLightening,
+    onLeftReelStopped,
+    onMidReelStopped,
+    onRightReelStopped,
+    onReelsStart,
+  }
+}
+
+export default function SlotMachine() {
+  const {
+    allReelsStopped,
+    showLightening,
+    hideLightening,
+    onLeftReelStopped,
+    onMidReelStopped,
+    onRightReelStopped,
+    onReelsStart,
+  } = useLighteningEffect()
 
   const [lastResult, setLastResult] = useState<LastResult>({ tt: '', dp: '', show: false, emoji: '' })
   const { actions, wallet: { balance }, balances: { TT } } = useDApp()
@@ -145,9 +192,11 @@ export default function SlotMachine() {
   const [betAmount, chooseBetAmount] = useState(0)
 
   const clear = useCallback(() => setLastResult({ tt: '', dp: '', show: false, emoji: '' }), [])
+  const hideLastResult = useCallback(() => setLastResult({ ...lastResult, show: false }), [lastResult])
 
   const play = useCallback(async () => {
     setSlots({ ...slots, spinning: true })
+    onReelsStart()
     clear()
 
     actions
@@ -158,7 +207,6 @@ export default function SlotMachine() {
         tokenReward: string
       }) => {
         debug('result: [%d, %d, %d] <TT: %s, P: %s>', ...symbols, payment, tokenReward)
-        setLighteningEffect(true)
         setSlots({ stops: symbols, spinning: false })
         setLastResult({ tt: payment, dp: tokenReward, show: true, emoji: goodLuck() })
       })
@@ -186,7 +234,6 @@ export default function SlotMachine() {
     /* eslint-disable-next-line react-hooks/exhaustive-deps */
   }, [tt])
 
-  const hideLightening = useCallback(() => setLighteningEffect(false), [])
   const Message = useMemo(() => {
     if (lastResult.error) {
       return <ErrorMessage>{
@@ -240,10 +287,10 @@ export default function SlotMachine() {
             height={38}
             overflow="hidden"
             position="relative"
-            onClick={clear}
+            onClick={hideLastResult}
           >
             <Slide
-              in={lastResult.show}
+              in={lastResult.show && allReelsStopped}
               container={message.current}
               direction="up"
               mountOnEnter
@@ -266,16 +313,19 @@ export default function SlotMachine() {
               spinning={slots.spinning}
               shift={slots.stops[0]}
               flex="32% 0 0"
+              onStop={onLeftReelStopped}
             />
             <Reel
               spinning={slots.spinning}
               shift={slots.stops[1]}
               flex="32% 0 0"
+              onStop={onMidReelStopped}
             />
             <Reel
               spinning={slots.spinning}
               shift={slots.stops[2]}
               flex="32% 0 0"
+              onStop={onRightReelStopped}
             />
           </Box>{/* /Reels */}
 
@@ -350,7 +400,7 @@ export default function SlotMachine() {
             overflow="hidden"
           >
             <StartButton
-              disabled={betAmount === 0 || tt < betAmount || slots.spinning}
+              disabled={betAmount === 0 || tt < betAmount || slots.spinning || showLightening}
               onClick={play}
             />
           </Box>{/* /Start */}
