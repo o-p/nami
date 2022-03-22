@@ -403,7 +403,13 @@ export default function SlotMachine() {
             overflow="hidden"
           >
             <StartButton
-              disabled={betAmount === 0 || tt < betAmount || slots.spinning || showLightening}
+              disabled={
+                betAmount === 0
+                || tt < betAmount
+                || slots.spinning
+                || showLightening
+                || !allReelsStopped
+              }
               onClick={play}
             />
           </Box>{/* /Start */}
