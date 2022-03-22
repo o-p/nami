@@ -2,6 +2,7 @@ import React, { useCallback, useMemo } from 'react'
 import Box, { BoxProps } from '@mui/material/Box'
 import styled from 'styled-components'
 import Typography from '@mui/material/Typography'
+import CountUp from 'react-countup'
 
 import { useDApp } from 'contexts/Web3'
 import ConnectButton from './ConnectButton'
@@ -46,7 +47,7 @@ export default function Header(props: BoxProps) {
           address: token.address,
           symbol: token.symbol,
           decimals: token.decimals,
-          image: `${process.env.PUBLIC_URL}/pmt.png`,
+          image: token.image,
         },
       },
     })
@@ -79,8 +80,12 @@ export default function Header(props: BoxProps) {
           <Typography variant="balance" component="p">
             <IconTT />
             &nbsp;
-            { balances?.TT?.display ?? balanceTT }
-            &nbsp;TT
+            <CountUp
+              end={Number((balances?.TT?.display ?? balanceTT)) || 0}
+              suffix=" TT"
+              decimals={3}
+              duration={1}
+            />
           </Typography>
           <Typography
             variant="balance"
@@ -88,8 +93,12 @@ export default function Header(props: BoxProps) {
           >
             <IconP onClick={addToWallet} />
             &nbsp;
-            { balances?.P?.display ?? '0.000' }
-            &nbsp;PMT
+            <CountUp
+              end={Number((balances?.P?.display ?? '0')) || 0}
+              suffix=" PMT"
+              decimals={3}
+              duration={1}
+            />
           </Typography>
         </Box>{/* /Balances */}
       </Box>

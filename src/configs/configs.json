@@ -10,7 +10,8 @@
       "address": "",
       "name": "Planet Token",
       "symbol": "PMT",
-      "decimals": 18
+      "decimals": 18,
+      "image": "https://master.diceplanet.xyz/pmt.png"
     },
     "WTT": {
       "address": "",

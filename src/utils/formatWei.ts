@@ -1,6 +1,6 @@
 import { BigNumberish, ethers } from 'ethers'
 
-const createWeiFormatter = (decimals = 18, floatPoints = 2, commify = true) =>
+const createWeiFormatter = (decimals = 18, floatPoints = 2, commify = false) =>
   commify
     ? (bn: BigNumberish) => {
       const [
