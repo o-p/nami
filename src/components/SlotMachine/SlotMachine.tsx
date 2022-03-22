@@ -129,6 +129,8 @@ const LuckyEmojis: string[] = [
 
 const goodLuck = () => LuckyEmojis[Math.floor(Math.random() * LuckyEmojis.length)]
 
+const sleep = (time: number) => new Promise((res) => { window.setTimeout(res, time) })
+
 const LEFT_SPINNING = 1 << 2
 const MID_SPINNING = 1 << 1
 const RIGHT_SPINNING = 1
@@ -216,6 +218,7 @@ export default function SlotMachine() {
         setSlots({ stops: initReels, spinning: false })
         setLastResult({ tt: '', dp: '', show: true, error: e, emoji: '' })
       })
+      .then(sleep(2500))
       .then(actions.refreshGameInfo)
       /* eslint-disable-next-line react-hooks/exhaustive-deps */
   }, [slots, betAmount, actions.play])
