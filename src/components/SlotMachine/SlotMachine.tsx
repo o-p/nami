@@ -226,7 +226,7 @@ export default function SlotMachine() {
   useEffect(() => {
     // Auto choose max bet
     if (betAmount === 0) {
-      const defaultAmount = [1000, 500, 100, 50, 10, 5].find(amount => tt > amount)
+      const defaultAmount = [3000, 1000, 500, 100, 50, 10].find(amount => tt > amount)
       if ((defaultAmount as number) > 0) chooseBetAmount(defaultAmount as number)
       return
     // Auto reset bets if TT is too low
