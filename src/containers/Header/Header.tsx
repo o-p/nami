@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from 'react'
+import React, { useCallback, useEffect, useMemo, useRef } from 'react'
 import Box, { BoxProps } from '@mui/material/Box'
 import styled from 'styled-components'
 import Typography from '@mui/material/Typography'
@@ -31,9 +31,12 @@ const formatCurrency = formatWei()
 
 export default function Header(props: BoxProps) {
   const { configs, wallet, balances } = useDApp()
+  const display = useRef<{ [token: string]: { start: number, end: number }}>({
+    TT: { start: 0, end: 0 },
+    PDT: { start: 0, end: 0 },
+  })
 
   const { balance } = wallet as { balance: string }
-  const balanceTT = useMemo(() => formatCurrency(balance), [balance])
 
   const addToWallet = useCallback(() => {
     const token = configs.token.P
@@ -53,6 +56,26 @@ export default function Header(props: BoxProps) {
     })
   /* eslint-disable-next-line react-hooks/exhaustive-deps */
   }, [wallet.ethereum])
+
+  useEffect(() => {
+    const { TT, PDT } = display.current
+    const tt = Number((balances?.TT?.display ?? formatCurrency(balance))) || 0
+    const pdt = Number((balances?.P?.display ?? '0')) || 0
+
+    if (TT.end !== tt) {
+      display.current.TT = {
+        start: TT.end,
+        end: tt,
+      }
+    }
+
+    if (PDT.end !== pdt) {
+      display.current.PDT = {
+        start: PDT.end,
+        end: pdt,
+      }
+    }
+  }, [balance, balances?.TT, balances?.P])
 
   return (
     <Box
@@ -81,7 +104,8 @@ export default function Header(props: BoxProps) {
             <IconTT />
             &nbsp;
             <CountUp
-              end={Number((balances?.TT?.display ?? balanceTT)) || 0}
+              start={display.current.TT.start}
+              end={display.current.TT.end}
               suffix=" TT"
               decimals={3}
               duration={1}
@@ -94,7 +118,8 @@ export default function Header(props: BoxProps) {
             <IconP onClick={addToWallet} />
             &nbsp;
             <CountUp
-              end={Number((balances?.P?.display ?? '0')) || 0}
+              start={display.current.PDT.start}
+              end={display.current.PDT.end}
               suffix=" PMT"
               decimals={3}
               duration={1}

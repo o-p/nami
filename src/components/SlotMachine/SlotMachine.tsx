@@ -218,7 +218,7 @@ export default function SlotMachine() {
         setSlots({ stops: initReels, spinning: false })
         setLastResult({ tt: '', dp: '', show: true, error: e, emoji: '' })
       })
-      .then(sleep(2500))
+      .then(sleep(4000))
       .then(actions.refreshGameInfo)
       /* eslint-disable-next-line react-hooks/exhaustive-deps */
   }, [slots, betAmount, actions.play])
