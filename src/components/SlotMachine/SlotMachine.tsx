@@ -60,41 +60,23 @@ const initReels = [
   Math.floor(Math.random() * SYMBOL_COUNTS),
 ]
 
-const EarnedReward = styled.p`
-  text-align: center;
-  z-index: 100;
-  color: #FF0;
-  max-width: 330px;
-  padding: 0 8px;
-  margin: 0;
-  font-size: 24px;
-  line-height: 38px;
-  cursor: point;
-`
-
-const EarnedRewardSpan = styled.span`
-  text-align: center;
-  z-index: 100;
-  color: #FF0;
-  max-width: 330px;
-  padding: 0 8px;
-  margin: 0;
-  font-size: 24px;
-  line-height: 38px;
-  cursor: point;
-`
-
-
 const TokenReward = styled.p`
   text-align: center;
   z-index: 100;
-  color: #FF9D00;
   max-width: 330px;
   padding: 0 8px;
   margin: 0;
+  font-family: 'Squada One', cursive;
   font-size: 24px;
   line-height: 38px;
   cursor: point;
+`
+
+const EarnedTT = styled.span`
+  color: #FF0;
+`
+const EarnedPMT = styled.span`
+  color: #FF9D00;
 `
 
 const ErrorMessage = styled.h3`
@@ -243,11 +225,17 @@ export default function SlotMachine() {
         lastResult.error.message ?? lastResult.error.toString()
       }</ErrorMessage>
     } else if (Number(lastResult.dp) > 0 && Number(lastResult.tt) > 0) { // Has last result of TT and earned P
-      return <TokenReward><EarnedRewardSpan>+{ lastResult.tt } TT</EarnedRewardSpan> { lastResult.dp } PMT</TokenReward>
+      return (
+        <TokenReward>
+          <EarnedTT>+{ lastResult.tt } TT</EarnedTT>
+          &nbsp;
+          <EarnedPMT>{ lastResult.dp } PMT</EarnedPMT>
+        </TokenReward>
+      )
     } else if (Number(lastResult.dp) > 0) { // Has last result of TT and earned P
-      return <TokenReward>+{ lastResult.dp } PMT</TokenReward>
+      return <TokenReward><EarnedPMT>+{ lastResult.dp } PMT</EarnedPMT></TokenReward>
     } else if (Number(lastResult.tt) > 0) { // Has last result of TT and earned TT
-      return <EarnedReward>+{ lastResult.tt } TT</EarnedReward>
+      return <TokenReward><EarnedTT>+{ lastResult.tt } TT</EarnedTT></TokenReward>
     } else if (lastResult.tt) { // Has last result but earned nothing
       return <Score>{ lastResult.emoji }</Score>
     }

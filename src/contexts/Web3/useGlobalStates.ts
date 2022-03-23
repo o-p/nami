@@ -99,6 +99,7 @@ const formatToken = formatWei(18, 3)
 const REFRESH_TIMEOUT = 10000
 export default function useGlobalStates() {
   const refreshStatus = useRef({
+    pauseAutoRefresh: false,
     fetching: false,
     lastUpdate: 0,
     lastAutoUpdate: 0,
@@ -126,6 +127,7 @@ export default function useGlobalStates() {
   const play = useCallback(async (bet: number) => {
     if (wallet.status !== 'connected') throw new Error('Unable to play game before connecting')
     if (!game) throw new Error('Contract disconnected')
+    refreshStatus.current.pauseAutoRefresh = true
 
     debug('Play -- bet amount: %d', bet)
 
@@ -139,6 +141,7 @@ export default function useGlobalStates() {
     debug('Play -- receive events: %o', events)
 
     const event = events.find(({ event }) => event === 'Play')
+    refreshStatus.current.pauseAutoRefresh = false
 
     // Contract didn't emit Play event correctly.
     // Possible reasons:
@@ -178,12 +181,13 @@ export default function useGlobalStates() {
   const unbox = useCallback(async (prize: BigNumberish) => {
     if (wallet.status !== 'connected') throw new Error('Unable to unbox before connecting')
     if (!game) throw new Error('Contract disconnected')
-
+    refreshStatus.current.pauseAutoRefresh = true
     debug('Unbox -- current prize: %s', prize.toString())
 
     const { wait } = await game?.unbox(prize, {
       gasLimit: 1000000,
     })
+    refreshStatus.current.pauseAutoRefresh = false
 
     const { events = [] } = await wait(1)
 
@@ -429,6 +433,7 @@ export default function useGlobalStates() {
   // auto refresh
   useEffect(() => {
     if (!document.hidden
+      && !refreshStatus.current.pauseAutoRefresh
       && refreshStatus.current.lastUpdate + REFRESH_TIMEOUT < Date.now()
     ) {
       refreshGameInfo()
