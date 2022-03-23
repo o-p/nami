@@ -33,7 +33,7 @@ export default function Header(props: BoxProps) {
   const { configs, wallet, balances } = useDApp()
   const display = useRef<{ [token: string]: { start: number, end: number }}>({
     TT: { start: 0, end: 0 },
-    PDT: { start: 0, end: 0 },
+    PMT: { start: 0, end: 0 },
   })
 
   const { balance } = wallet as { balance: string }
@@ -58,9 +58,9 @@ export default function Header(props: BoxProps) {
   }, [wallet.ethereum])
 
   useEffect(() => {
-    const { TT, PDT } = display.current
+    const { TT, PMT } = display.current
     const tt = Number((balances?.TT?.display ?? formatCurrency(balance))) || 0
-    const pdt = Number((balances?.P?.display ?? '0')) || 0
+    const pmt = Number((balances?.P?.display ?? '0')) || 0
 
     if (TT.end !== tt) {
       display.current.TT = {
@@ -69,13 +69,13 @@ export default function Header(props: BoxProps) {
       }
     }
 
-    if (PDT.end !== pdt) {
-      display.current.PDT = {
-        start: PDT.end,
-        end: pdt,
+    if (PMT.end !== pmt) {
+      display.current.PMT = {
+        start: PMT.end,
+        end: pmt,
       }
     }
-  }, [balance, balances?.TT, balances?.P])
+  }, [balance, balances?.TT?.display, balances?.P?.display])
 
   return (
     <Box
@@ -118,8 +118,8 @@ export default function Header(props: BoxProps) {
             <IconP onClick={addToWallet} />
             &nbsp;
             <CountUp
-              start={display.current.PDT.start}
-              end={display.current.PDT.end}
+              start={display.current.PMT.start}
+              end={display.current.PMT.end}
               suffix=" PMT"
               decimals={3}
               duration={1}
