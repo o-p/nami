@@ -264,7 +264,7 @@ export default function useGlobalStates() {
     }
   }, [fullState.network])
 
-  const approveDP = useCallback(async () => {
+  const approvePMT = useCallback(async () => {
     if (wallet.status !== 'connected') throw new Error('Unable to approve before connecting')
     if (!tokenP) throw new Error('Contract disconnected')
 
@@ -460,7 +460,7 @@ export default function useGlobalStates() {
       setConnection,
       refreshGameInfo,
       play,
-      approveDP,
+      approvePMT,
       unbox,
       showError,
       clearError,

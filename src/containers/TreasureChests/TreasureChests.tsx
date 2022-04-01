@@ -75,7 +75,7 @@ function TreasureChests() {
       unboxFee,
     },
     actions: {
-      approveDP,
+      approvePMT,
       refreshGameInfo,
       unbox,
       showError,
@@ -86,7 +86,7 @@ function TreasureChests() {
     () => {
       setApproving(true)
 
-      approveDP()
+      approvePMT()
         .catch((e: any) => {
           showError(e.message ?? e.toString())
         })
@@ -95,7 +95,7 @@ function TreasureChests() {
 
     },
     /* eslint-disable-next-line react-hooks/exhaustive-deps */
-    [approveDP, refreshGameInfo]
+    [approvePMT, refreshGameInfo]
   )
 
   const choose = useCallback((index: number) => () => {

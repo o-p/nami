@@ -1,10 +1,12 @@
 import React, { useState, forwardRef, useCallback } from 'react'
 import { ethers } from 'ethers'
 import Box from '@mui/material/Box'
+import Stack from '@mui/material/Stack'
 import Container from '@mui/material/Container'
 import Dialog from '@mui/material/Dialog'
 import Slide, { SlideProps } from '@mui/material/Slide'
 
+import { LaserSwap } from 'components/ExternalLinks'
 import CloseButton from 'components/CloseButton'
 import ErrorMessage from 'components/ErrorMessage'
 import MenuButton from 'components/MenuButton'
@@ -59,6 +61,14 @@ function GameView() {
           onClick={openTreasureView}
         />
       </Box>
+      <Stack
+        position="absolute"
+        top={0}
+        right={0}
+        zIndex={100}
+      >
+        <LaserSwap>Buy PMT</LaserSwap>
+      </Stack>
       <Dialog
         fullWidth
         maxWidth="sm"
