@@ -3,7 +3,6 @@ import { ChainUnsupportedError } from 'use-wallet'
 import { styled } from '@mui/material/styles'
 
 import { useDApp } from 'contexts/Web3'
-import shortenAccount from 'utils/shortenAccount'
 
 const Button = styled(ButtonBase)({
   fontFamily: `'Nova Mono', monospace`,
@@ -12,6 +11,11 @@ const Button = styled(ButtonBase)({
   border: '1px solid #FFFA',
   padding: '1px 6px',
 })
+
+const rAccount = /^(0x[0-9a-fA-F]{4})[0-9a-fA-F]{32}([0-9a-fA-F]{4})$/
+function shortenAccount(account: string) {
+  return account.replace(rAccount, '$1...$2')
+}
 
 export default function ConnectButton(props: ButtonBaseProps) {
   const {

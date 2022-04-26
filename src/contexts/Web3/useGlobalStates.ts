@@ -1,8 +1,8 @@
 import { useState, useCallback, useEffect, useMemo, useReducer, useRef } from 'react'
 import { useWallet, Connectors, Wallet } from 'use-wallet'
-import { BigNumber, BigNumberish, ethers, constants } from 'ethers'
+import { BigNumber, BigNumberish, ethers } from 'ethers'
 import { ExternalProvider } from '@ethersproject/providers'
-import { ContractTransaction, Event as ContractEvent } from '@ethersproject/contracts'
+import { ContractTransaction } from '@ethersproject/contracts'
 
 import {
   Multicall,
@@ -34,9 +34,6 @@ export interface AppGlobalState {
     }
   }
   error?: Error | string | null
-  events: {
-    unbox: { from: string, blockNumber: number, earned: BigNumber | null }[]
-  }
   game: {
     dpAllowance: BigNumber
     acculatedPrize: BigNumber
@@ -59,9 +56,6 @@ const readonly = new ethers.providers.JsonRpcProvider(config<string>('rpc-url', 
 const initState: AppGlobalState = {
   configs,
   balances: {},
-  events: {
-    unbox: [],
-  },
   game: {
     dpAllowance: ethers.constants.Zero,
     acculatedPrize: ethers.constants.Zero,
@@ -74,7 +68,6 @@ const initState: AppGlobalState = {
     },
     isReadOnly: true,
     error: null,
-    blockNumber: 0,
   },
   wallet: {},
   actions: {},
@@ -121,27 +114,14 @@ export default function useGlobalStates() {
     ...changes,
   }), initState)
 
-  const tokenPMT = useP(fullState.network.defaultProvider) as null | {
+  const tokenP = useP(fullState.network.defaultProvider) as null | {
     balanceOf: (account: string) => Promise<BigNumber>
     approve: (spender: string, amount: BigNumberish) => Promise<ContractTransaction>
-    filters: {
-      Transfer: (from: string | null, to: string | null) => any
-    }
-    queryFilter: (
-      event: string,
-      fromBlockOrBlockHash?: string | number,
-      toBlock?: number
-    ) => Promise<ContractEvent[]>
   }
 
   const game = useSlotMachine(fullState.network.defaultProvider) as null | {
     play: (settings?: { value: BigNumberish, gasLimit: BigNumberish }) => Promise<ContractTransaction>
     unbox: (prize: BigNumberish, settings?: { gasLimit: BigNumberish }) => Promise<ContractTransaction>
-    queryFilter: (
-      event: string,
-      fromBlockOrBlockHash?: string | number,
-      toBlock?: number
-    ) => Promise<ContractEvent[]>
   }
 
   const play = useCallback(async (bet: number) => {
@@ -231,59 +211,6 @@ export default function useGlobalStates() {
   /* eslint-disable-next-line react-hooks/exhaustive-deps */
   }, [fullState.network.defaultProvider])
 
-  const queryUnboxHistory = useCallback(async () => {
-    if (!game || !tokenPMT) throw new Error('Contract disconnected')
-
-    const { blockNumber } = fullState.network
-
-    const burnedEvents = tokenPMT.queryFilter(
-      tokenPMT.filters.Transfer(null, constants.AddressZero),
-      blockNumber - 86400 * 2,
-      blockNumber
-    )
-
-    const successUnboxEvents = game.queryFilter(
-      'Unbox',
-      blockNumber - 86400 * 2,
-      blockNumber
-    )
-
-    return Promise.all([
-      burnedEvents,
-      successUnboxEvents,
-    ]).then(([burned, unbox]) => {
-      // { [blockNumber]: { from, earned } }
-      const history = Object.fromEntries(
-        burned
-          .filter(ev => ev.args!.value.eq(fullState.game.unboxFee))
-          .map(ev => [ev.blockNumber, { from: ev.args!.from, earned: null }])
-      )
-
-      return unbox.reduce((all, ev) => Object.assign(all, {
-        [ev.blockNumber]: {
-          ...(all[ev.blockNumber] ?? null),
-          from: ev.args!.player,
-          earned: ev.args!.payment,
-        },
-      }), history)
-    }).then((history) => {
-      changeState({
-        events: {
-          ...fullState.events,
-          unbox: Object
-            .entries(history)
-            .map(([blockNumber, { from, earned }]) => ({
-              blockNumber: parseInt(blockNumber, 10),
-              from,
-              earned,
-            }))
-            .reverse()
-        }
-      })
-    }).catch((e) => { console.error('Query unbox records failure', e) })
-    /* eslint-disable-next-line react-hooks/exhaustive-deps */
-  }, [fullState.network, game])
-
   const setConnection = useCallback(async (method: keyof Connectors | '') => {
     debug('switch connection to: %s', method)
     if (method !== '') {
@@ -339,11 +266,11 @@ export default function useGlobalStates() {
 
   const approvePMT = useCallback(async () => {
     if (wallet.status !== 'connected') throw new Error('Unable to approve before connecting')
-    if (!tokenPMT) throw new Error('Contract disconnected')
+    if (!tokenP) throw new Error('Contract disconnected')
 
     debug('Approve DP')
     const gameAddress = fullState.configs.contract.SlotMachine
-    const { wait } = await tokenPMT?.approve(gameAddress, ethers.constants.MaxUint256)
+    const { wait } = await tokenP?.approve(gameAddress, ethers.constants.MaxUint256)
 
     const { events = [] } = await wait(1)
 
@@ -388,15 +315,7 @@ export default function useGlobalStates() {
         calls: [
           { reference: 'game', methodName: 'getEthBalance', methodParameters: [gameAddress] },
         ],
-      },
-      {
-        reference: 'chain',
-        abi: AbiMulticall2,
-        contractAddress: multicallAddress,
-        calls: [
-          { reference: 'blockNumber', methodName: 'getBlockNumber', methodParameters: [] },
-        ],
-      },
+      }
     ]
 
     if (userAddress) {
@@ -427,13 +346,11 @@ export default function useGlobalStates() {
 
     return multicall
       .call(requests)
-      .then(({ results: { gameUnboxFee, gameAcculatedPrize, P, TT, chain } }) => {
+      .then(({ results: { gameUnboxFee, gameAcculatedPrize, P, TT } }) => {
         const game = { ...fullState.game }
         const balanceP = { ...fullState.balances.P }
         const balanceTT = { ...fullState.balances.TT }
-        const network = { ...fullState.network }
 
-        if (chain.callsReturnContext[0].success) network.blockNumber = ethers.BigNumber.from(chain.callsReturnContext[0].returnValues[0]).toNumber()
         if (gameUnboxFee.callsReturnContext[0].success) game.unboxFee = ethers.BigNumber.from(gameUnboxFee.callsReturnContext[0].returnValues[0])
         if (gameAcculatedPrize.callsReturnContext[0].success) game.acculatedPrize = ethers.BigNumber.from(gameAcculatedPrize.callsReturnContext[0].returnValues[0])
 
@@ -451,7 +368,6 @@ export default function useGlobalStates() {
             P: balanceP,
             TT: balanceTT,
           },
-          network,
         })
       })
       .then(() => {
@@ -548,7 +464,6 @@ export default function useGlobalStates() {
       unbox,
       showError,
       clearError,
-      queryUnboxHistory,
     },
   }
 }

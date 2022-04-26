@@ -76,13 +76,6 @@ export const theme = createTheme({
         -1px -1px #6FF9
       `
     },
-    records: {
-      fontFamily: `VT323, monospace`,
-      fontSize: 14,
-      lineHeight: 1.5,
-      color: '#FFF',
-      whiteSpace: 'nowrap',
-    },
   },
   zIndex: {},
 })

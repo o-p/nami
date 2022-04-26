@@ -20,7 +20,6 @@ const Title = styled.p`
 
 interface IconProps {
   src: string
-  size?: number
 }
 
 export interface ImageLinkProps extends ButtonProps {
@@ -30,9 +29,9 @@ export interface ImageLinkProps extends ButtonProps {
   textColor?: string
 }
 
-const Icon = styled.img<IconProps>`
-  width: ${props => props.size ?? 48}px;
-  height: ${props => props.size ?? 48}px;
+const Icon = styled.img`
+  width: 48px;
+  height: 48px;
   margin: 0 6px 12px 6px;
 `
 

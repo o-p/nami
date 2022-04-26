@@ -69,7 +69,6 @@ function TreasureChests() {
   const {
     configs: { token: { P: { decimals } } },
     balances,
-
     game: {
       acculatedPrize,
       dpAllowance,

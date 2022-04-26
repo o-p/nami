@@ -23,7 +23,6 @@ declare module 'slot-machine' {
 declare module "@mui/material/styles" {
   interface TypographyVariants {
     balance: React.CSSProperties
-    records: React.CSSProperties
     score: React.CSSProperties
     treasureHints: React.CSSProperties
   }
@@ -31,7 +30,6 @@ declare module "@mui/material/styles" {
   // allow configuration using `createTheme`
   interface TypographyVariantsOptions {
     balance?: React.CSSProperties
-    records?: React.CSSProperties
     score?: React.CSSProperties
     treasureHints?: React.CSSProperties & { '& small': React.CSSProperties }
   }
@@ -41,7 +39,6 @@ declare module "@mui/material/styles" {
 declare module "@mui/material/Typography" {
   interface TypographyPropsVariantOverrides {
     balance: true
-    records: true
     score: true
     treasureHints: true
   }
