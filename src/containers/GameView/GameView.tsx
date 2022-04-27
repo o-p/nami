@@ -6,13 +6,15 @@ import Container from '@mui/material/Container'
 import Dialog from '@mui/material/Dialog'
 import Slide, { SlideProps } from '@mui/material/Slide'
 
-import { LaserSwap } from 'components/ExternalLinks'
+import { Portal, Reward } from 'components/ExternalLinks'
 import CloseButton from 'components/CloseButton'
 import ErrorMessage from 'components/ErrorMessage'
 import MenuButton from 'components/MenuButton'
 import SlotMachine from 'components/SlotMachine'
 import Header from 'containers/Header'
 import TreasureChests from 'containers/TreasureChests'
+import Links from 'containers/Links'
+import UnboxHistory from 'containers/UnboxHistory'
 import useDApp from 'contexts/Web3'
 import formatWei from 'utils/formatWei'
 
@@ -33,11 +35,19 @@ const dialogPaperProps = {
 function GameView() {
   const { balances, game, error, actions } = useDApp()
   const [showTreasures, setTreasureView] = useState(false)
+  const [showLinks, setLinksView] = useState(false)
+  const [showUnboxHistory, setUnboxHistoryView] = useState(false)
   const hasTreasure = (game?.unboxFee?.gt(0) ?? false)
     && (balances.P?.amount?.gte(game.unboxFee) ?? false)
 
   const openTreasureView = useCallback(() => setTreasureView(true), [])
   const closeTreasureView = useCallback(() => setTreasureView(false), [])
+
+  const openLinks = useCallback(() => setLinksView(true), [])
+  const closeLinks = useCallback(() => setLinksView(false), [])
+
+  const openUnboxHistory = useCallback(() => setUnboxHistoryView(true), [])
+  const closeUnboxHistory = useCallback(() => setUnboxHistoryView(false), [])
 
   const prize = game.acculatedPrize.gt(ethers.constants.WeiPerEther)
     ? `Pool ${formatPrize(game.acculatedPrize)} TT`
@@ -49,7 +59,7 @@ function GameView() {
       maxWidth="sm"
       disableGutters
     >
-      <Box
+      <Stack
         position="absolute"
         top={0}
         left={0}
@@ -60,14 +70,15 @@ function GameView() {
           prize={prize}
           onClick={openTreasureView}
         />
-      </Box>
+        <Reward onClick={openUnboxHistory}>Winners</Reward>
+      </Stack>
       <Stack
         position="absolute"
         top={0}
         right={0}
         zIndex={100}
       >
-        <LaserSwap>Buy PMT</LaserSwap>
+        <Portal onClick={openLinks}>Portal</Portal>
       </Stack>
       <Dialog
         fullWidth
@@ -81,6 +92,32 @@ function GameView() {
           <CloseButton onClick={closeTreasureView} />
         </Box>
         <TreasureChests />
+      </Dialog>
+      <Dialog
+        fullWidth
+        maxWidth="sm"
+        open={showLinks}
+        onClose={closeLinks}
+        TransitionComponent={Transition}
+        PaperProps={dialogPaperProps}
+      >
+        <Box display="flex" justifyContent="end">
+          <CloseButton onClick={closeLinks} />
+        </Box>
+        <Links />
+      </Dialog>
+      <Dialog
+        fullWidth
+        maxWidth="sm"
+        open={showUnboxHistory}
+        onClose={closeUnboxHistory}
+        TransitionComponent={Transition}
+        PaperProps={dialogPaperProps}
+      >
+        <Box display="flex" justifyContent="end">
+          <CloseButton onClick={closeUnboxHistory} />
+        </Box>
+        <UnboxHistory />
       </Dialog>
 
       <Header

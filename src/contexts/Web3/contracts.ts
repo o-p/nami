@@ -45,7 +45,7 @@ export function useWTT(provider: BaseProvider) {
   return useERC20(provider, config('token.WTT.address'))
 }
 
-export function useP(provider: BaseProvider) {
+export function usePMT(provider: BaseProvider) {
   return useERC20(provider, config('token.P.address'))
 }
 
