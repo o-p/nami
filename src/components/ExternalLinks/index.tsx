@@ -9,7 +9,9 @@ export function LaserSwap({ image, href, title, ...props }: Partial<ImageLinkPro
     <ImageLink
       image={laserswap}
       href={LaserSwapPath}
-      textColor="#dd2013"
+      textColor="#c7f7a1"
+      textSize={24}
+      textPosition={-14}
       {...props}
     />
   )
@@ -22,6 +24,8 @@ export function DicePlanet({ image, href, title, ...props }: Partial<ImageLinkPr
       image={diceplanet}
       href={DicePlanetPath}
       textColor="#ecb633"
+      textSize={24}
+      textPosition={-14}
       {...props}
     />
   )
@@ -55,6 +59,8 @@ export function ComingSoon({ image, href, title, ...props }: Partial<ImageLinkPr
       image={dragon}
       href=""
       textColor="#907500"
+      textSize={24}
+      textPosition={-14}
       {...props}
     />
   )

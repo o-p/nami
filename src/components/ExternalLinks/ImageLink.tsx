@@ -3,19 +3,24 @@ import React from 'react'
 import styled from 'styled-components'
 import Button, { ButtonProps } from '@mui/material/Button'
 
-const Title = styled.p`
+interface TitleProps {
+  fontSize?: number
+  color?: string
+  bottom?: number
+}
+const Title = styled.p<TitleProps>`
   position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
+  bottom: ${props => props.bottom ?? 0}px;
+  min-width: 100%;
   margin: 0;
   padding: 0;
   text-align: center;
   font-family: 'VT323', monospace;
-  font-size: 12px;
+  font-size: ${props => props.fontSize ?? 14}px;
   font-weight: 800;
   text-transform: none;
-  color: ${props => props.color ?? '#000'}
+  color: ${props => props.color ?? '#000'};
+  white-space: nowrap;
 `
 
 interface IconProps {
@@ -28,6 +33,8 @@ export interface ImageLinkProps extends ButtonProps {
   href: string
   iconProps?: Partial<IconProps>
   textColor?: string
+  textSize?: number
+  textPosition?: number
 }
 
 const Icon = styled.img<IconProps>`
@@ -42,6 +49,8 @@ export default function ImageLink({
   iconProps,
   image,
   textColor = '#000',
+  textSize,
+  textPosition,
   ...props
 }: ImageLinkProps) {
   return (
@@ -56,7 +65,7 @@ export default function ImageLink({
       {...props}
     >
       <Icon src={image} {...iconProps} />
-      <Title color={textColor}>
+      <Title color={textColor} fontSize={textSize} bottom={textPosition}>
         { children }
       </Title>
     </Button>
