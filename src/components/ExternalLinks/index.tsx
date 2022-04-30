@@ -1,4 +1,4 @@
-import { diceplanet, dragon, laserswap, portal, reward } from './images'
+import { diceplanet, dragon, laserswap, portal, reward, telegram } from './images'
 import ImageLink, { ImageLinkProps } from './ImageLink'
 
 import { config } from 'configs'
@@ -48,6 +48,19 @@ export function Reward({ image, href, title, ...props }: Partial<ImageLinkProps>
       image={reward}
       href=""
       textColor="#fde262"
+      {...props}
+    />
+  )
+}
+
+export function Telegram({ image, href, title, ...props }: Partial<ImageLinkProps>) {
+  return (
+    <ImageLink
+      image={telegram}
+      href="https://t.me/diceplanet"
+      textColor="#48bed8"
+      textSize={24}
+      textPosition={-14}
       {...props}
     />
   )
